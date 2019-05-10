@@ -12,7 +12,7 @@ public:
 	bool rcs = false;
 	int rcs_x = 0;
 	int rcs_y = 0;
-	int linear_progression_threshold = 0;
+	int linear_progression_threshold = 1;
 	bool prefer_bodyaim[6] = { false, false, false, false, false };
 	int bodyaim_mode = 0;
 	/*--------------------------------------*/

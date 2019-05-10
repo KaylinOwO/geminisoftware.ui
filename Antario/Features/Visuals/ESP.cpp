@@ -7,7 +7,7 @@
 #include "..\..\SDK\IVModelInfo.h"
 #include "..\..\SDK\IEngineTrace.h"
 #include "../../SDK/ClientClass.h"
-#include "../std2017.h"
+
 #include <algorithm>
 
 
@@ -853,6 +853,19 @@ void c_visuals::DrawPlayers() {
 
 
 
+template<class T>
+constexpr const T& clampv2(const T& v, const T& lo, const T& hi)
+{
+	return clamp(v, lo, hi, std::less<>());
+}
+
+template<class T, class Compare>
+constexpr const T& clampv2(const T& v, const T& lo, const T& hi, Compare comp)
+{
+	return assert(!comp(hi, lo)),
+		comp(v, lo) ? lo : comp(hi, v) ? hi : v;
+}
+
 void c_visuals::draw_scope() {
 
 	if (!c_config::get().remove_scope || !c_config::get().visuals_enabled)
@@ -880,7 +893,7 @@ void c_visuals::draw_scope() {
 			return;
 
 		float spread = weapon->GetInaccuracy() * 100;
-		int height = std2017::clamp(spread, 1.f, 30.f);
+		int height = clampv2(spread, 1.f, 30.f);
 		int alpha = 255 - (height * 4.2f);
 
 		bool Dynamic = c_config::get().dynamic_scope;

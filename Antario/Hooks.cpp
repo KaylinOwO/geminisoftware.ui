@@ -1995,37 +1995,6 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 #include "Features/Aimbot/LagComp.h"
 static auto linegoesthrusmoke = Utils::FindPattern("client_panorama.dll", (PBYTE)"\x55\x8B\xEC\x83\xEC\x08\x8B\x15\x00\x00\x00\x00\x0F\x57\xC0", "xxxxxxxx????xxx");
 
-int GetEstimatedServerTickCount(float latency)
-{
-	return TIME_TO_TICKS(latency) + 1 + g_pGlobalVars->tickcount;
-}
-
-bool IsValidTick(PlayerRecords tick)
-{
-	float outlatency;
-	float inlatency;
-	INetChannelInfo *nci = g_pEngine->GetNetChannelInfo();
-	if (nci)
-	{
-		inlatency = nci->GetLatency(FLOW_INCOMING);
-		outlatency = nci->GetLatency(FLOW_OUTGOING);
-	}
-	else
-		inlatency = outlatency = 0.0f;
-
-	float totaloutlatency = outlatency;
-	if (nci)
-		totaloutlatency += nci->GetAvgLatency(FLOW_OUTGOING); //net_graph method
-
-	float servertime = TICKS_TO_TIME(GetEstimatedServerTickCount(outlatency + inlatency));
-
-	float correct = std2017::clamp<float>(totaloutlatency + g_LagComp.LerpTime(), .0f, 1.0f);
-	int iTargetTick = TIME_TO_TICKS(tick.SimTime);
-	float deltaTime = correct - (servertime - TICKS_TO_TIME(iTargetTick));
-	return (fabsf(deltaTime) <= 0.2f);
-}
-
-
 IMaterial *create_material(bool shade, bool wireframe, bool ignorez, int rimlight_boost = 0) {
 	static const std::string material_name = "game_material.vmt";
 	const std::string material_type = shade ? "VertexLitGeneric" : "UnlitGeneric";

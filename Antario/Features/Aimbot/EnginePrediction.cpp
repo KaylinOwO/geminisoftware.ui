@@ -233,12 +233,38 @@ int iButtonsBackup;
 int iFlagsBackup;
 int* m_pSetPredictionPlayer;
 
+float engine_prediction::curtime;
+float engine_prediction::frametime;
+
 void engine_prediction::RunEnginePred()
 {
-
+	CMoveData moveData;
+	auto pLocal = Globals::LocalPlayer;//
+	// backup time
+	curtime = g_pGlobalVars->curtime;
+	frametime = g_pGlobalVars->frametime;
+	//make moveData
+	memset(&moveData, 0, sizeof(CMoveData));
+	// correct time
+	g_pGlobalVars->curtime = pLocal->GetTickBase() * g_pGlobalVars->intervalPerTick;
+	g_pGlobalVars->frametime = g_pGlobalVars->intervalPerTick;
+	// set host
+	pLocal->SetCurrentCommand(Globals::pCmd);
+	// start prediction
+	g_pMovement->StartTrackPredictionErrors(pLocal);
+	g_pPrediction->SetupMove(pLocal, Globals::pCmd, g_pMoveHelper, &moveData);
+	g_pMovement->ProcessMovement(pLocal, &moveData);
+	g_pPrediction->FinishMove(pLocal, Globals::pCmd, &moveData);
 }
 
 void engine_prediction::EndEnginePred()
 {
-
+	g_pMovement->FinishTrackPredictionErrors(Globals::LocalPlayer);
+	// restore time
+	g_pGlobalVars->curtime = curtime;
+	g_pGlobalVars->frametime = frametime;
+	// reset host
+	Globals::LocalPlayer->SetCurrentCommand(nullptr);
+	//adjust tickbase
+	Globals::LocalPlayer->SetTickBase(Globals::LocalPlayer->GetTickBase() + 1);
 }

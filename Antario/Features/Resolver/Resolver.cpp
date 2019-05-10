@@ -179,7 +179,7 @@ void HandleBackUpResolve(C_BaseEntity* pEnt) {
 
 	player_animation_state->m_flGoalFeetYaw = v136;
 
-	static int stored_yaw = 0;
+	/*static int stored_yaw = 0;
 
 	if (pEnt->GetEyeAnglesPointer()->y != stored_yaw) {
 		if ((pEnt->GetEyeAnglesPointer()->y - stored_yaw > 120)) { // Arbitrary high angle value.
@@ -189,7 +189,7 @@ void HandleBackUpResolve(C_BaseEntity* pEnt) {
 
 			stored_yaw = pEnt->GetEyeAnglesPointer()->y;
 		}
-	}
+	}*/
 	//if (pEnt->GetVelocity().Length2D() > 0.1f)
 	//{
 	//	player_animation_state->m_flGoalFeetYaw = ApproachAngle(pEnt->GetLowerBodyYaw(), player_animation_state->m_flGoalFeetYaw, (player_animation_state->m_flStopToFullRunningFraction * 20.0f) + 30.0f *player_animation_state->m_flLastClientSideAnimationUpdateTime);

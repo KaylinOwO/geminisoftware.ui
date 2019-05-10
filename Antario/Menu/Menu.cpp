@@ -642,6 +642,8 @@ void Menu::Render()
 
 	std::string BodyAimOptions[5] = { "In Air", "Slow Walk", "High Inaccuracy", "Vulnerable", "Lethal" };
 
+	std::string HitboxOptionz[2] = { "Hitscan", "Head Only" };
+
 	std::string AutoStopOptions[4] = { "Minimum Speed", "Full Stop" };
 
 	std::string BodyAimModeOptions[2] = { "Prefer", "Force" };

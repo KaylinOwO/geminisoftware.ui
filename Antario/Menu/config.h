@@ -25,6 +25,7 @@ public:
 	int aimbot_bodypointscale = 0;
 	int aimbot_fov = 0;
 	bool aimbot_resolver = false;
+	int aimbot_hitbox;
 
 	bool autostop = false;
 	bool autorevolver = false;

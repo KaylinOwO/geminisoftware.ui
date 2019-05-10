@@ -202,6 +202,12 @@ void CConfig::Setup()
 	SetupValue(c_config::get().scar20_skin, 0, "Skins", "scar20_skin");
 	SetupValue(c_config::get().g3sg1_skin, 0, "Skins", "g3sg1_skin");
 	SetupValue(c_config::get().ssg08_skin, 0, "Skins", "ssg08_skin");
+	SetupValue(c_config::get().ak47_skin, 0, "Skins", "ak47_skin");
+	SetupValue(c_config::get().m4a4_skin, 0, "Skins", "m4a4_skin");
+	SetupValue(c_config::get().m4a1_s_skin, 0, "Skins", "m4a1_s_skin");
+	SetupValue(c_config::get().deagle_skin, 0, "Skins", "deagle_skin");
+	SetupValue(c_config::get().r8_skin, 0, "Skins", "r8_skin");
+	SetupValue(c_config::get().cz75_skin, 0, "Skins", "cz75_skin");
 }
 
 void CConfig::export_to_clipboard(std::string file) {

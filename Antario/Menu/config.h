@@ -6,6 +6,7 @@ private:
 public:
 
 	bool legit_aimbot_enabled = false;
+	bool legit_aimbot_backtrack = false;
 	int legit_aimbot_fov = 0;
 	int legit_aimbot_priority_hitbox = 0;
 	bool rcs = false;

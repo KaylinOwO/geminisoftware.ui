@@ -25,9 +25,10 @@ void CConfig::Setup()
 {
 
 	SetupValue(c_config::get().aimbot_enabled, false, "Aimbot", "aimbot_enabled");
-	SetupValue(c_config::get().legit_aimbot_fov, 0, "Aimbot", "aimbot_enabled");
-	SetupValue(c_config::get().linear_progression_threshold, 0, "Aimbot", "aimbot_enabled");
-	SetupValue(c_config::get().rcs, false, "Aimbot", "aimbot_enabled");
+	SetupValue(c_config::get().legit_aimbot_backtrack, false, "Aimbot", "legit_aimbot_backtrack");
+	SetupValue(c_config::get().legit_aimbot_fov, 0, "Aimbot", "legit_aimbot_fov");
+	SetupValue(c_config::get().linear_progression_threshold, 0, "Aimbot", "linear_progression_threshold");
+	SetupValue(c_config::get().rcs, false, "Aimbot", "rcs");
 	SetupValue(c_config::get().rcs_x, 0, "Aimbot", "rcs_x");
 	SetupValue(c_config::get().rcs_y, 0, "Aimbot", "rcs_y");
 

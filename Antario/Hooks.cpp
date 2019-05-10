@@ -801,6 +801,9 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 
 	Globals::OriginalView = Globals::pCmd->viewangles;
 
+	if (Globals::LocalPlayer && Globals::LocalPlayer->IsAlive()) {
+		backtracking->legitBackTrack(pCmd, Globals::LocalPlayer);
+	}
 
     g_Misc.OnCreateMove();
 	g_Resolver.OnCreateMove();
@@ -1236,6 +1239,10 @@ void __stdcall Hooks::FrameStageNotify(ClientFrameStage_t curStage)
 	if (curStage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
 	{
 		NewSkinChanger();
+
+		if (Globals::LocalPlayer && Globals::LocalPlayer->IsAlive()) {
+			backtracking->Update(g_pGlobalVars->tickcount);
+		}
 	}
 
 	oFrameStage(curStage);

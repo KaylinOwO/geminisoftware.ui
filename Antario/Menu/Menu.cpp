@@ -650,6 +650,7 @@ void Menu::Render()
 	{
 		groupbox(5, 52, GroupBoxSize_Width, GroupBoxSize_Height, "test");
 		checkbox("Enabled", &c_config::get().legit_aimbot_enabled);
+		checkbox("Position Adjustment", &c_config::get().legit_aimbot_backtrack);
 		slider(180, "FOV", &c_config::get().legit_aimbot_fov, "", 1);
 		slider(100, "Linear Progression Threshold", &c_config::get().linear_progression_threshold, "", 1);
 		checkbox("RCS", &c_config::get().rcs);

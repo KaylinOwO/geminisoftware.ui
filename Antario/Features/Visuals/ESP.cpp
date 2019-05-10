@@ -856,7 +856,7 @@ void c_visuals::DrawPlayers() {
 template<class T>
 constexpr const T& clampv2(const T& v, const T& lo, const T& hi)
 {
-	return clamp(v, lo, hi, std::less<>());
+	return clampv2(v, lo, hi, std::less<>());
 }
 
 template<class T, class Compare>

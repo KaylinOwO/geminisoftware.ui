@@ -1935,7 +1935,13 @@ void __fastcall Hooks::OverrideView(void* ecx, void* edx, CViewSetup* pSetup)
 			pSetup->fov = c_config::get().fov;
 		}
 		else if (Globals::LocalPlayer->IsScoped() && !c_config::get().fov_while_zoomed) {
-			pSetup->fov = c_config::get().fov - 40;
+
+			int fov_to_subtract = 40;
+
+			if (c_config::get().fov < 40) {
+				fov_to_subtract = c_config::get().fov / 2;
+			}
+			pSetup->fov = c_config::get().fov - fov_to_subtract;
 		}
 
 

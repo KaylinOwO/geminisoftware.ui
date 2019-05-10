@@ -976,7 +976,7 @@ void NewSkinChanger()
 				Weap->GetItemIDLow() = -1;
 				Weap->GetItemIDHigh() = -1;
 				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().knife_skin);
-				//*Weap->FallbackWear() = 0.00000000001;
+				*Weap->FallbackWear() = 0.00000000001;
 			}
 
 			switch (Weap->GetItemDefinitionIndex()) {

@@ -239,6 +239,13 @@ bool ShouldBaim(C_BaseEntity* pEnt) // probably dosnt make sense
 	if (pEnt->GetHealth() <= Damage && c_config::get().prefer_bodyaim[4])
 		return true;
 
+	if (pEnt->GetHealth() <= c_config::get().bodyaim_health)
+		return true;
+
+	if (Globals::MissedShots[pEnt->EntIndex()] > c_config::get().bodyaim_shots && c_config::get().bodyaim_shots > 0)
+		return true;
+	
+
 	return false;
 }
 

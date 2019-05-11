@@ -15,6 +15,8 @@ public:
 	int linear_progression_threshold = 1;
 	bool prefer_bodyaim[6] = { false, false, false, false, false };
 	int bodyaim_mode = 0;
+	int bodyaim_health = 0;
+	int bodyaim_shots = 0;
 	/*--------------------------------------*/
 	bool aimbot_enabled = false;	// AIMBOT SETTINGS
 	/*--------------------------------------*/

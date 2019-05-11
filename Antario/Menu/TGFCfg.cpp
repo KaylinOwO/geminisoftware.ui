@@ -86,7 +86,9 @@ void CConfig::Setup()
 	SetupValue(c_config::get().on_shot_aa, false, "Aimbot", "on_shot_aa");
 	SetupValue(c_config::get().on_shot_aa_type, 0, "Aimbot", "on_shot_aa_type");
 	SetupValue(c_config::get().aa_jitter, 0, "Aimbot", "aa_jitter");
-
+	SetupValue(c_config::get().bodyaim_health, 0, "Aimbot", "bodyaim_health");
+	SetupValue(c_config::get().bodyaim_shots, 0, "Aimbot", "bodyaim_shots");
+	
 	SetupValue(c_config::get().visuals_enabled, false, "Visuals", "Enabled");
 	SetupValue(c_config::get().fov, 0, "Visuals", "Fov");
 	SetupValue(c_config::get().nightmode, false, "Visuals", "Nightmode");

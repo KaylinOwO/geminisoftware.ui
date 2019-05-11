@@ -698,6 +698,8 @@ void Menu::Render()
 		{			
 			MultiComboBox(5, "Body-Aim", BodyAimOptions, c_config::get().prefer_bodyaim);
 			combobox(2, "Body-Aim Mode", BodyAimModeOptions, &c_config::get().bodyaim_mode);
+			slider(101, "Baim < X Health", &c_config::get().bodyaim_health, "HP", 1);
+			slider(10, "Baim After X Missed Shots", &c_config::get().bodyaim_shots, "X", 1);
 		}
 		break;
 		}

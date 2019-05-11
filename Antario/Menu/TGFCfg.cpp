@@ -186,6 +186,11 @@ void CConfig::Setup()
 	SetupValue(c_config::get().local_glow_color_g, 255, "Visuals", "local_glow_color_g");
 	SetupValue(c_config::get().local_glow_color_b, 255, "Visuals", "local_glow_color_b");
 	SetupValue(c_config::get().local_glow_color_a, 255, "Visuals", "local_glow_color_a");
+
+	SetupValue(c_config::get().draw_hit_player_esp_color_r, 255, "Visuals", "draw_hit_player_esp_color_r");
+	SetupValue(c_config::get().draw_hit_player_esp_color_g, 255, "Visuals", "draw_hit_player_esp_color_g");
+	SetupValue(c_config::get().draw_hit_player_esp_color_b, 255, "Visuals", "draw_hit_player_esp_color_b");
+	SetupValue(c_config::get().draw_hit_player_esp_color_a, 255, "Visuals", "draw_hit_player_esp_color_a");
 	
 	SetupValue(c_config::get().misc_bhop, false, "Misc", "Bunny_hop");
 	SetupValue(c_config::get().misc_autostrafe, false, "Misc", "Auto_strafe");

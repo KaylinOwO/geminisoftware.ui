@@ -108,6 +108,8 @@ void CConfig::Setup()
 	//SetupValue(c_config::get().visual_spectator_list, false, "Visuals", "visual_preserve_killfeed");
 	SetupValue(c_config::get().remove_flash, false, "Visuals", "remove_flash");
 	SetupValue(c_config::get().ragdoll_launcher, false, "Visuals", "ragdoll_launcher");
+	SetupValue(c_config::get().draw_hit_player, false, "Visuals", "draw_hit_player");
+	SetupValue(c_config::get().hit_player_duration, 0, "Visuals", "hit_player_duration");
 
 	/*
 	Enemies

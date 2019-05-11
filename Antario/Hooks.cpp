@@ -1816,6 +1816,57 @@ static T2* FindHudElement2(const char* name)
 	static auto find_hud_element = reinterpret_cast<DWORD(__thiscall*)(void*, const char*)>(Utils::FindSignature("client_panorama.dll", "55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39 77 28"));
 	return (T2*)find_hud_element(pThis, name);
 }
+
+float dot_product(const Vector& a, const Vector& b) {
+	return (a.x * b.x
+		+ a.y * b.y
+		+ a.z * b.z);
+}
+
+static void CapsuleOverlay(C_BaseEntity* pPlayer, Color col, float duration)
+{
+	if (!pPlayer)
+		return;
+
+	studiohdr_t* pStudioModel = g_pModelInfo->GetStudiomodel((model_t*)pPlayer->GetModel());
+	if (!pStudioModel)
+		return;
+
+	static matrix3x4_t pBoneToWorldOut[128];
+	if (!pPlayer->SetupBones(pBoneToWorldOut, 128, 256, 0))
+		return;
+
+	mstudiohitboxset_t* pHitboxSet = pStudioModel->GetHitboxSet(0);
+	if (!pHitboxSet)
+		return;
+
+	auto VectorTransform2 = [](const Vector in1, matrix3x4_t in2, Vector & out)
+	{
+
+		out[0] = dot_product(in1, Vector(in2[0][0], in2[0][1], in2[0][2])) + in2[0][3];
+		out[1] = dot_product(in1, Vector(in2[1][0], in2[1][1], in2[1][2])) + in2[1][3];
+		out[2] = dot_product(in1, Vector(in2[2][0], in2[2][1], in2[2][2])) + in2[2][3];
+	};
+
+	for (int i = 0; i < pHitboxSet->numhitboxes; i++)
+	{
+		mstudiobbox_t* pHitbox = pHitboxSet->GetHitbox(i);
+		if (!pHitbox)
+			continue;
+
+		Vector vMin, vMax;
+		VectorTransform2(pHitbox->min, pBoneToWorldOut[pHitbox->bone], vMin); //nullptr???
+		VectorTransform2(pHitbox->max, pBoneToWorldOut[pHitbox->bone], vMax);
+
+		if (pHitbox->radius > -1)
+		{
+			g_pIVDebugOverlay->AddCapsuleOverlay(vMin, vMax, pHitbox->radius, col.red, col.green, col.blue, col.alpha, duration);
+		}
+	}
+}
+
+
+
 void Event::FireGameEvent(IGameEvent* event)
 {
 	if (!event)
@@ -1842,6 +1893,16 @@ void Event::FireGameEvent(IGameEvent* event)
 		g_pEngine->GetPlayerInfo(index, &pInfo);
 
 		Globals::Hit[index] = true;
+
+		if (c_config::get().draw_hit_player) {
+			C_BaseEntity* hittedplayer = (C_BaseEntity*)g_pEntityList->GetClientEntity(g_pEngine->GetPlayerForUserID(event->GetInt("userid")));
+
+			if (hittedplayer && hittedplayer->EntIndex() > 0 && hittedplayer->EntIndex() < 64)
+			{
+				if (Globals::LocalPlayer && hittedplayer != Globals::LocalPlayer)
+					CapsuleOverlay(hittedplayer, Color(c_config::get().draw_hit_player_esp_color_r, c_config::get().draw_hit_player_esp_color_g, c_config::get().draw_hit_player_esp_color_b, 255), c_config::get().hit_player_duration);
+			}
+		}
 
 		if (c_config::get().hitmarker) {
 
@@ -1976,7 +2037,6 @@ void __fastcall Hooks::OverrideView(void* ecx, void* edx, CViewSetup* pSetup)
 			pSetup->angles[1] -= (viewPunch[1] + (aimPunch[1] * 2 * 0.4499999f));
 			pSetup->angles[2] -= (viewPunch[2] + (aimPunch[2] * 2 * 0.4499999f));
 		}
-
 	}
 
 	oOverrideView(ecx, edx, pSetup);

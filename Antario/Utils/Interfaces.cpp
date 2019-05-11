@@ -49,6 +49,8 @@ CInput*		  g_GameInput = nullptr;
 IViewRenderBeams* g_pRenderBeams = nullptr;
 CGlowObjectManager* g_GlowManager = nullptr;
 CClientState*		g_pClientState = nullptr;
+IVDebugOverlay* g_pIVDebugOverlay = nullptr;
+
 namespace interfaces
 {
 	template< class T >
@@ -151,6 +153,7 @@ namespace interfaces
 		g_pRenderBeams = *reinterpret_cast<IViewRenderBeams**>(Utils::FindSignature("client_panorama.dll", "A1 ? ? ? ? 56 8B F1 B9 ? ? ? ? FF 50 08") + 0x1);
 		g_GlowManager = *reinterpret_cast<CGlowObjectManager**>(Utils::FindSignature("client_panorama.dll", "0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00") + 3);
 		g_pClientState = util::get_method(g_pEngine, 12).add(16).get(2).as< CClientState* >();
+		g_pIVDebugOverlay = FindClass<IVDebugOverlay>("engine.dll", "VDebugOverlay");
 
 		auto pdwClient = *(PDWORD_PTR*)g_pClientDll;
 		g_GameInput = *(CInput**)(Utils::FindSignature("client_panorama.dll", "B9 ? ? ? ? F3 0F 11 04 24 FF 50 10") + 1);

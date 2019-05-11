@@ -108,6 +108,8 @@ public:
 	int chams_xqz_esp_color_r = 255, chams_xqz_esp_color_g = 255, chams_xqz_esp_color_b = 255, chams_xqz_esp_color_a = 255;
 
 	int fov_arrows_esp_color_r = 255, fov_arrows_esp_color_g = 255, fov_arrows_esp_color_b = 255, fov_arrows_esp_color_a = 255;
+
+	int draw_hit_player_esp_color_r = 255, draw_hit_player_esp_color_g = 255, draw_hit_player_esp_color_b = 255, draw_hit_player_esp_color_a = 255;
 	/*
 	Teammates
 	*/
@@ -140,6 +142,8 @@ public:
 	bool force_crosshair = false;
 	bool nightmode = false;
 	bool hitmarker = false;
+	bool draw_hit_player;
+	int hit_player_duration;
 	int hitmarker_sound = 0;
 	bool no_smoke = false;
 	bool transparent_props = false;

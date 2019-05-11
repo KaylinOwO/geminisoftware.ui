@@ -259,7 +259,8 @@ void CalcAngle34(Vector src, Vector dst, Vector &angles)
 bool Autowall::CanWallbang(float &dmg)
 {
 	auto local = Globals::LocalPlayer;
-	if (!local || !Globals::LocalPlayer)
+
+	if (!local)
 		return false;
 
 	if (!Globals::LocalPlayer->IsAlive())

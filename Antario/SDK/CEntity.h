@@ -226,7 +226,11 @@ public:
 
 #define dwThis (DWORD)this
 #define NETVAR(type,offset) *(type*)(dwThis + offset)
-
+#define NETVARV9(type, name, table, netvar)                           \
+    type& name##() const {                                          \
+        static int _##name = g_pNetvars->GetOffset(table, netvar);     \
+        return *(type*)((uintptr_t)this + _##name);                 \
+	}
 class C_BaseEntity : public IClientUnknown, public IClientRenderable, public IClientNetworkable
 {
 private:
@@ -548,6 +552,7 @@ public:
 	{
 		return (int*)((uintptr_t)this + g_pNetvars->GetOffset("DT_BaseViewModel", "m_nViewModelIndex"));
 	}
+	NETVARV9(CHandle<viewmodel_t>, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
 	int* OwnerXuidLow()
 	{
 		return (int*)((uintptr_t)this + 0x31B0);

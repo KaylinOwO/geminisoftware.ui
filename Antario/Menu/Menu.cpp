@@ -105,6 +105,51 @@ void DrawESPPlayersSubTab(int& current_players_esp_subtab, int tab_amount, Vecto
 	}
 }
 
+void DrawESPOthersSubtab(int& current_players_esp_subtab, int tab_amount, Vector _pos, int MenuAlpha_Main)
+{
+	int in_sizew_esp_player_subtabs = (375 / 1.5) - 8;
+	static std::string ESP_Player_SubTabs_Names[2] = { "Part 1", "Part 2" };
+
+	for (int i = 0; i < tab_amount; i++)
+	{
+		RECT text_size2 = g_pSurface->GetTextSizeRect(Globals::SmallText, ESP_Player_SubTabs_Names[i].c_str());
+
+		int tab_area[4] = {
+			_pos.x + TopLeftGroupBox_X + GroupBoxSize_Width + 5 + 4 + (i * (in_sizew_esp_player_subtabs / tab_amount)),
+			_pos.y + 52 + 5,
+			(in_sizew_esp_player_subtabs / tab_amount), 
+			20
+		};
+
+		if (GetAsyncKeyState(VK_LBUTTON) && g_pSurface->MouseInRegion(tab_area[0], tab_area[1], tab_area[2],
+			tab_area[3]))
+			current_players_esp_subtab = i;
+
+		if (current_players_esp_subtab == i)
+		{
+			g_pSurface->FilledRect(tab_area[0], tab_area[1], tab_area[2], tab_area[3], Color(37, 37, 45, MenuAlpha_Main));
+
+			g_pSurface->FilledRect(tab_area[0], tab_area[1] + tab_area[3], tab_area[2], 3, Color(c_config::get().menu_color_r, c_config::get().menu_color_g, c_config::get().menu_color_b, MenuAlpha_Main));
+
+			g_pSurface->DrawT(tab_area[0] + (((in_sizew_esp_player_subtabs / tab_amount) / 2) - (text_size2.right / 2)),
+				tab_area[1] + (tab_area[3] / 2) - (text_size2.bottom / 2),
+				Color(143, 143, 143, MenuAlpha_Main), Globals::SmallText, false,
+				ESP_Player_SubTabs_Names[i].c_str());
+		}
+		else
+		{
+			g_pSurface->FilledRect(tab_area[0], tab_area[1], tab_area[2], tab_area[3], Color(27, 27, 35, MenuAlpha_Main));
+			g_pSurface->FilledRect(tab_area[0], tab_area[1] + tab_area[3], tab_area[2], 3, Color(39, 39, 47, MenuAlpha_Main));
+
+			g_pSurface->DrawT(tab_area[0] + (((in_sizew_esp_player_subtabs / tab_amount) / 2) - (text_size2.right / 2)),
+				tab_area[1] + (tab_area[3] / 2) - (text_size2.bottom / 2),
+				Color(143, 143, 143, MenuAlpha_Main), Globals::SmallText, false,
+				ESP_Player_SubTabs_Names[i].c_str());
+		}
+	}
+}
+
+
 void DrawAimbotTargetSubTab(int& current_players_esp_subtab, int tab_amount, Vector _pos, int MenuAlpha_Main)
 {
 	int in_sizew_esp_player_subtabs = (375 / 1.5) - 8;
@@ -874,23 +919,37 @@ void Menu::Render()
 			checkbox("Local Glow", &c_config::get().local_glow);
 		}
 
+		static int current_other_esp_subtab = 0;
+		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, 52, GroupBoxSize_Width, GroupBoxSize_Height, "test", false, true);
+		DrawESPOthersSubtab(current_other_esp_subtab, 2, _pos, MenuAlpha_Main);
 
-		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, 52, GroupBoxSize_Width, GroupBoxSize_Height, "test");
+		switch (current_other_esp_subtab) {
+		case 0: {
+			checkbox("Remove Scope", &c_config::get().remove_scope);
+			if (c_config::get().remove_scope)
+			{
+				checkbox("Display spread with scope", &c_config::get().dynamic_scope);
+			}
+			checkbox("Hit Marker", &c_config::get().hitmarker);
+			combobox(3, "Hit Marker Sound", Hitmarker_Type, &c_config::get().hitmarker_sound);
 
-		checkbox("Remove Scope", &c_config::get().remove_scope);
-		if (c_config::get().remove_scope)
-		{
-			checkbox("Display spread with scope", &c_config::get().dynamic_scope);
+			checkbox("Force Crosshair", &c_config::get().force_crosshair);
+			checkbox("Preserve Killfeed", &c_config::get().visual_preserve_killfeed);
+			checkbox("Penetration Crosshair", &c_config::get().penetration_crosshair);
+			checkbox("Radar", &c_config::get().visuals_radar);
+		}break;
+		case 1: {
+			checkbox("Grenade Prediction", &c_config::get().grenade_prediction);
+			checkbox("Ragdoll Launcher", &c_config::get().ragdoll_launcher);
+			color_selector("draw_hit_player_col", &c_config::get().draw_hit_player_esp_color_r, &c_config::get().draw_hit_player_esp_color_g,
+				&c_config::get().draw_hit_player_esp_color_b, &c_config::get().draw_hit_player_esp_color_a);
+			checkbox("Player Hit Visualization", &c_config::get().draw_hit_player);
+			if (c_config::get().draw_hit_player) {
+				slider(10, "Player Hit Visualization Duration", &c_config::get().hit_player_duration, "S", 1);
+			}
+		}break;
 		}
-		checkbox("Hit Marker", &c_config::get().hitmarker);
-		combobox(3, "Hit Marker Sound", Hitmarker_Type, &c_config::get().hitmarker_sound);
-		
-		checkbox("Force Crosshair", &c_config::get().force_crosshair);
-		checkbox("Preserve Killfeed", &c_config::get().visual_preserve_killfeed);
-		checkbox("Penetration Crosshair", &c_config::get().penetration_crosshair);
-		checkbox("Radar", &c_config::get().visuals_radar);
-		checkbox("Grenade Prediction", &c_config::get().grenade_prediction);
-		checkbox("Ragdoll Launcher", &c_config::get().ragdoll_launcher);
+
 
 
 		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, TopLeftGroupBox_Y, GroupBoxSize_Width, GroupBoxSize_Height,

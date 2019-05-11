@@ -77,7 +77,7 @@ public:
 	/*--------------------------------------*/
 	bool remove_visual_recoil = false;
 	bool draw_spread = false;
-
+	bool ragdoll_launcher = false;
 	/*
 	Enemies
 	*/

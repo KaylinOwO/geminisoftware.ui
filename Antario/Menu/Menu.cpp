@@ -888,6 +888,9 @@ void Menu::Render()
 		checkbox("Penetration Crosshair", &c_config::get().penetration_crosshair);
 		checkbox("Radar", &c_config::get().visuals_radar);
 		checkbox("Grenade Prediction", &c_config::get().grenade_prediction);
+		checkbox("Ragdoll Launcher", &c_config::get().ragdoll_launcher);
+
+
 		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, TopLeftGroupBox_Y, GroupBoxSize_Width, GroupBoxSize_Height,
 			"test");
 		slider(135, "Field Of View", &c_config::get().fov, "°", 1);

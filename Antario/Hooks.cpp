@@ -5,6 +5,7 @@
 #include "Menu\Menu.h"
 #include "Features/Visuals/EventLogging.h"
 #include "../std2017.h"
+
 Misc     g_Misc;
 Hooks    g_Hooks;
 Event    g_Event;
@@ -246,6 +247,7 @@ struct BulletImpact_t
 std::deque<BulletImpact_t>				Impacts;
 RecvVarProxyFn oRecvnModelIndex;
 RecvVarProxyFn fnSequenceProxyFn = NULL;
+RecvVarProxyFn ovecForce = nullptr;
 #define RandomInt(nMin, nMax) (rand() % (nMax - nMin + 1) + nMin);
 void SetViewModelSequence(const CRecvProxyData *pDataConst, void *pStruct, void *pOut) {
 	// Make the incoming data editable.
@@ -610,6 +612,21 @@ void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut
 	oRecvnModelIndex(pData, pStruct, pOut);
 }
 
+void vec_force(CRecvProxyData* data, void* pStruct, void* out) {
+	Vector v;
+
+	v.x = data->m_Value.m_Vector[0];
+	v.y = data->m_Value.m_Vector[1];
+	v.z = data->m_Value.m_Vector[2];
+	if (c_config::get().ragdoll_launcher) {
+		Vector pp;
+		Vector angles{ -45, g_Math.RandomFloat(-180, 180), 0 };
+		g_Math.AngleVectors(angles, &pp, nullptr, nullptr);
+
+		v = pp * 9999999999.0f;
+	}
+	*(Vector*)out = v;
+}
 
 void ApplyAAAHooks()
 {
@@ -651,6 +668,19 @@ void ApplyAAAHooks()
 				}
 			}
 		}
+
+		if (!strcmp(pszName, "DT_CSRagdoll")) {
+			for (int i = 0; i < pClass->pRecvTable->nProps; i++)
+			{
+				RecvProp* pProp = &(pClass->pRecvTable->pProps[i]);
+				const char* name = pProp->pVarName;
+				if (!strcmp(name, "m_vecForce")) {
+					ovecForce = (RecvVarProxyFn)pProp->ProxyFn;
+					pProp->ProxyFn = (RecvVarProxyFn)vec_force;
+				}
+			}
+		}
+
 		pClass = pClass->pNext;
 	}
 }

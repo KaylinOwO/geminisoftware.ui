@@ -581,12 +581,6 @@ public:
 		return Utils::GetVFunc<Fn>(this, 89)(this, h);
 	}
 
-	IMaterial* GetMaterial(MaterialHandle_t h)
-	{
-		typedef IMaterial*(__thiscall* Fn)(void*, MaterialHandle_t);
-		return Utils::GetVFunc<Fn>(this, 89)(this, h);
-	}
-
 	//IMaterialSystem::UpdateConfig(bool bForceUpdate); // index 20
 //	IMaterialSystem::OverrideConfig(const MaterialSystem_Config_t &config, bool bForceUpdate); // index 21
 

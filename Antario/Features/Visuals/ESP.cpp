@@ -551,6 +551,9 @@ void arrows(C_BaseEntity* player) {
 	if (!player)
 		return;
 
+	if (!player->IsAlive())
+		return;
+
 	if (player->IsDormant())
 		return;
 

@@ -20,183 +20,195 @@ it still gets rekt by other things
 
 void Resolver::AnimationFix(C_BaseEntity* pEnt)
 {
-	//who needs structs or classes not me lol
-	static float oldSimtime[65];
-	static float storedSimtime[65];
-	static float ShotTime[65];
-	static float SideTime[65][3];
-	static int LastDesyncSide[65];
-	static bool Delaying[65];
-	static AnimationLayer StoredLayers[64][15];
-	static C_AnimState* StoredAnimState[65];
-	static float StoredPosParams[65][24];
-	static Vector oldEyeAngles[65];
-	static float oldGoalfeetYaw[65];
-	float* PosParams = (float*)((uintptr_t)pEnt + 0x2774);
-	bool update = false;
-	bool shot = false;
-
-	static bool jittering[65];
-
-	auto * AnimState = pEnt->AnimState();
-	if (!AnimState || !pEnt->AnimOverlays() || !PosParams)
-		return;
-
-	auto RemapVal = [](float val, float A, float B, float C, float D) -> float
-	{
-		if (A == B)
-			return val >= B ? D : C;
-		return C + (D - C) * (val - A) / (B - A);
-	};
-
-	if (storedSimtime[pEnt->EntIndex()] != pEnt->GetSimulationTime())
-	{
-		jittering[pEnt->EntIndex()] = false;
+	if (pEnt == Globals::LocalPlayer) {
 		pEnt->ClientAnimations(true);
+		auto player_animation_state = pEnt->AnimState();
+		player_animation_state->m_flLeanAmount = 20;
+		player_animation_state->m_flCurrentTorsoYaw += 15;
+		pEnt->UpdateClientAnimation();
+		pEnt->SetAbsAngles(Vector(0, player_animation_state->m_flGoalFeetYaw, 0));
+		pEnt->ClientAnimations(false);
+	}
+	else {
+		auto player_index = pEnt->EntIndex() - 1;
+
+		pEnt->ClientAnimations(true);
+
+		auto old_curtime = g_pGlobalVars->curtime;
+		auto old_frametime = g_pGlobalVars->frametime;
+
+		g_pGlobalVars->curtime = pEnt->GetSimulationTime();
+		g_pGlobalVars->frametime = g_pGlobalVars->intervalPerTick;
+
+		auto player_animation_state = pEnt->AnimState();
+		auto player_model_time = reinterpret_cast<int*>(player_animation_state + 112);
+		if (player_animation_state != nullptr && player_model_time != nullptr)
+			if (*player_model_time == g_pGlobalVars->framecount)
+				*player_model_time = g_pGlobalVars->framecount - 1;
+
+
 		pEnt->UpdateClientAnimation();
 
-		memcpy(StoredPosParams[pEnt->EntIndex()], PosParams, sizeof(float) * 24);
-		memcpy(StoredLayers[pEnt->EntIndex()], pEnt->AnimOverlays(), (sizeof(AnimationLayer) * pEnt->NumOverlays()));
+		g_pGlobalVars->curtime = old_curtime;
+		g_pGlobalVars->frametime = old_frametime;
 
-		oldGoalfeetYaw[pEnt->EntIndex()] = AnimState->m_flGoalFeetYaw;
+		//pEnt->SetAbsAngles(Vector(0, player_animation_state->m_flGoalFeetYaw, 0));
 
-		if (pEnt->GetActiveWeapon() && !pEnt->IsKnifeorNade())
+		pEnt->ClientAnimations(false);
+	}
+	
+}
+float flAngleMod(float flAngle)
+{
+	return((360.0f / 65536.0f) * ((int32_t)(flAngle * (65536.0f / 360.0f)) & 65535));
+}
+float ApproachAngle(float target, float value, float speed)
+{
+	target = flAngleMod(target);
+	value = flAngleMod(value);
+
+	float delta = target - value;
+
+	// Speed is assumed to be positive
+	if (speed < 0)
+		speed = -speed;
+
+	if (delta < -180)
+		delta += 360;
+	else if (delta > 180)
+		delta -= 360;
+
+	if (delta > speed)
+		value += speed;
+	else if (delta < -speed)
+		value -= speed;
+	else
+		value = target;
+
+	return value;
+}
+/*
+
+
+*/
+
+void update_state(C_AnimState * state, Vector angles) {
+	using Fn = void(__vectorcall*)(void *, void *, float, float, float, void *);
+	static auto fn = reinterpret_cast<Fn>(Utils::FindSignature("client_panorama.dll", "55 8B EC 83 E4 F8 83 EC 18 56 57 8B F9 F3 0F 11 54 24"));
+	fn(state, nullptr, 0.0f, angles[1], angles[0], nullptr);
+}
+
+void HandleBackUpResolve(C_BaseEntity* pEnt) {
+
+	if (!c_config::get().aimbot_resolver)
+		return;
+
+	if (pEnt->GetTeam() == Globals::LocalPlayer->GetTeam())
+		return;
+
+	const auto player_animation_state = pEnt->AnimState();
+
+	if (!player_animation_state)
+		return;
+
+	float m_flLastClientSideAnimationUpdateTimeDelta = fabs(player_animation_state->m_iLastClientSideAnimationUpdateFramecount - player_animation_state->m_flLastClientSideAnimationUpdateTime);
+
+	auto v48 = 0.f;
+
+	if (player_animation_state->m_flFeetSpeedForwardsOrSideWays >= 0.0f)
+	{
+		v48 = fminf(player_animation_state->m_flFeetSpeedForwardsOrSideWays, 1.0f);
+	}
+	else
+	{
+		v48 = 0.0f;
+	}
+
+	float v49 = ((player_animation_state->m_flStopToFullRunningFraction * -0.30000001) - 0.19999999) * v48;
+
+	float flYawModifier = v49 + 1.0;
+
+	if (player_animation_state->m_fDuckAmount > 0.0)
+	{
+		float v53 = 0.0f;
+
+		if (player_animation_state->m_flFeetSpeedUnknownForwardOrSideways >= 0.0)
 		{
-			if (ShotTime[pEnt->EntIndex()] != pEnt->GetActiveWeapon()->GetLastShotTime())
-			{
-				shot = true;
-				ShotTime[pEnt->EntIndex()] = pEnt->GetActiveWeapon()->GetLastShotTime();
-			}
-			else
-				shot = false;
+			v53 = fminf(player_animation_state->m_flFeetSpeedUnknownForwardOrSideways, 1.0);
 		}
 		else
 		{
-			shot = false;
-			ShotTime[pEnt->EntIndex()] = 0.f;
+			v53 = 0.0f;
 		}
-
-		float angToLocal = g_Math.NormalizeYaw(g_Math.CalcAngle(Globals::LocalPlayer->GetOrigin(), pEnt->GetOrigin()).y);
-
-		float Back = g_Math.NormalizeYaw(angToLocal);
-		float DesyncFix = 0;
-		float Resim = g_Math.NormalizeYaw((0.24f / (pEnt->GetSimulationTime() - oldSimtime[pEnt->EntIndex()])) * (oldEyeAngles[pEnt->EntIndex()].y - pEnt->GetEyeAngles().y));
-
-		if (Resim > 58.f)
-			Resim = 58.f;
-		if (Resim < -58.f)
-			Resim = -58.f;
-
-		if (pEnt->GetVelocity().Length2D() > 0.5f && !shot)
-		{
-			float Delta = g_Math.NormalizeYaw(g_Math.NormalizeYaw(g_Math.CalcAngle(Vector(0, 0, 0), pEnt->GetVelocity()).y) - g_Math.NormalizeYaw(g_Math.NormalizeYaw(AnimState->m_flGoalFeetYaw + RemapVal(PosParams[11], 0, 1, -60, 60)) + Resim));
-
-			int CurrentSide = 0;
-
-			if (Delta < 0)
-			{
-				CurrentSide = 1;
-				SideTime[pEnt->EntIndex()][1] = g_pGlobalVars->curtime;
-			}
-			else if (Delta > 0)
-			{
-				CurrentSide = 2;
-				SideTime[pEnt->EntIndex()][2] = g_pGlobalVars->curtime;
-			}
-
-			if (LastDesyncSide[pEnt->EntIndex()] == 1)
-			{
-				Resim += (58.f - Resim);
-				DesyncFix += (58.f - Resim);
-			}
-			if (LastDesyncSide[pEnt->EntIndex()] == 2)
-			{
-				Resim += (-58.f - Resim);
-				DesyncFix += (-58.f - Resim);
-			}
-
-			if (LastDesyncSide[pEnt->EntIndex()] != CurrentSide)
-			{
-				Delaying[pEnt->EntIndex()] = true;
-
-				if (.5f < (g_pGlobalVars->curtime - SideTime[pEnt->EntIndex()][LastDesyncSide[pEnt->EntIndex()]]))
-				{
-					LastDesyncSide[pEnt->EntIndex()] = CurrentSide;
-					Delaying[pEnt->EntIndex()] = false;
-				}
-			}
-
-			if (!Delaying[pEnt->EntIndex()])
-				LastDesyncSide[pEnt->EntIndex()] = CurrentSide;
-		}
-		else if (!shot)
-		{
-			float Brute = UseFreestandAngle[pEnt->EntIndex()] ? g_Math.NormalizeYaw(Back + FreestandAngle[pEnt->EntIndex()]) : pEnt->GetLowerBodyYaw();
-
-			float Delta = g_Math.NormalizeYaw(g_Math.NormalizeYaw(Brute - g_Math.NormalizeYaw(g_Math.NormalizeYaw(AnimState->m_flGoalFeetYaw + RemapVal(PosParams[11], 0, 1, -60, 60))) + Resim));
-
-			if (Delta > 58.f)
-				Delta = 58.f;
-			if (Delta < -58.f)
-				Delta = -58.f;
-
-			Resim += Delta;
-			DesyncFix += Delta;
-
-			if (Resim > 58.f)
-				Resim = 58.f;
-			if (Resim < -58.f)
-				Resim = -58.f;
-		}
-
-		float Equalized = g_Math.NormalizeYaw(g_Math.NormalizeYaw(AnimState->m_flGoalFeetYaw + RemapVal(PosParams[11], 0, 1, -60, 60)) + Resim);
-
-		float JitterDelta = fabs(g_Math.NormalizeYaw(oldEyeAngles[pEnt->EntIndex()].y - pEnt->GetEyeAngles().y));
-
-		if (JitterDelta >= 70.f && !shot)
-			jittering[pEnt->EntIndex()] = true;
-
-		if (pEnt != Globals::LocalPlayer && pEnt->GetTeam() != Globals::LocalPlayer->GetTeam() && (pEnt->GetFlags() & FL_ONGROUND) && c_config::get().aimbot_resolver)
-		{
-			if (jittering[pEnt->EntIndex()])
-				AnimState->m_flGoalFeetYaw = g_Math.NormalizeYaw(pEnt->GetEyeAngles().y + DesyncFix);
-			else
-				AnimState->m_flGoalFeetYaw = Equalized;
-
-			pEnt->SetLowerBodyYaw(AnimState->m_flGoalFeetYaw);
-		}
-
-		StoredAnimState[pEnt->EntIndex()] = AnimState;
-
-		oldEyeAngles[pEnt->EntIndex()] = pEnt->GetEyeAngles();
-
-		oldSimtime[pEnt->EntIndex()] = storedSimtime[pEnt->EntIndex()];
-
-		storedSimtime[pEnt->EntIndex()] = pEnt->GetSimulationTime();
-
-		update = true;
 	}
 
-	pEnt->ClientAnimations(false);
+	float flMaxYawModifier = player_animation_state->pad10[516] * flYawModifier;
+	float flMinYawModifier = player_animation_state->pad10[512] * flYawModifier;
 
-	if (pEnt != Globals::LocalPlayer && pEnt->GetTeam() != Globals::LocalPlayer->GetTeam() && (pEnt->GetFlags() & FL_ONGROUND) && c_config::get().aimbot_resolver)
-		pEnt->SetLowerBodyYaw(AnimState->m_flGoalFeetYaw);
+	float newFeetYaw = 0.f;
 
-	AnimState = StoredAnimState[pEnt->EntIndex()];
+	auto eyeYaw = player_animation_state->m_flEyeYaw;
 
-	memcpy((void*)PosParams, &StoredPosParams[pEnt->EntIndex()], (sizeof(float) * 24));
-	memcpy(pEnt->AnimOverlays(), StoredLayers[pEnt->EntIndex()], (sizeof(AnimationLayer) * pEnt->NumOverlays()));
+	auto lbyYaw = player_animation_state->m_flGoalFeetYaw;
 
-	if (pEnt != Globals::LocalPlayer && pEnt->GetTeam() != Globals::LocalPlayer->GetTeam() && (pEnt->GetFlags() & FL_ONGROUND) && c_config::get().aimbot_resolver && jittering[pEnt->EntIndex()])
-		pEnt->SetAbsAngles(Vector(0, pEnt->GetEyeAngles().y, 0));
+	float eye_feet_delta = fabs(eyeYaw - lbyYaw);
+
+	if (eye_feet_delta <= flMaxYawModifier)
+	{
+		if (flMinYawModifier > eye_feet_delta)
+		{
+			newFeetYaw = fabs(flMinYawModifier) + eyeYaw;
+		}
+	}
 	else
-		pEnt->SetAbsAngles(Vector(0, oldGoalfeetYaw[pEnt->EntIndex()], 0));
+	{
+		newFeetYaw = eyeYaw - fabs(flMaxYawModifier);
+	}
 
-	*reinterpret_cast<int*>(uintptr_t(pEnt) + 0xA30) = g_pGlobalVars->framecount;
-	*reinterpret_cast<int*>(uintptr_t(pEnt) + 0xA28) = 0;
+	float v136 = fmod(newFeetYaw, 360.0);
+
+	if (v136 > 180.0)
+	{
+		v136 = v136 - 360.0;
+	}
+
+	if (v136 < 180.0)
+	{
+		v136 = v136 + 360.0;
+	}
+
+	player_animation_state->m_flGoalFeetYaw = v136;
+
+	/*static int stored_yaw = 0;
+
+	if (pEnt->GetEyeAnglesPointer()->y != stored_yaw) {
+		if ((pEnt->GetEyeAnglesPointer()->y - stored_yaw > 120)) { // Arbitrary high angle value.
+			if (pEnt->GetEyeAnglesPointer()->y - stored_yaw > 120) {
+				pEnt->GetEyeAnglesPointer()->y = pEnt->GetEyeAnglesPointer()->y - (pEnt->GetEyeAnglesPointer()->y - stored_yaw);
+			}
+
+			stored_yaw = pEnt->GetEyeAnglesPointer()->y;
+		}
+	}*/
+	//if (pEnt->GetVelocity().Length2D() > 0.1f)
+	//{
+	//	player_animation_state->m_flGoalFeetYaw = ApproachAngle(pEnt->GetLowerBodyYaw(), player_animation_state->m_flGoalFeetYaw, (player_animation_state->m_flStopToFullRunningFraction * 20.0f) + 30.0f *player_animation_state->m_flLastClientSideAnimationUpdateTime);
+	//}
+	//else
+	//{
+	//	player_animation_state->m_flGoalFeetYaw = ApproachAngle(pEnt->GetLowerBodyYaw(), player_animation_state->m_flGoalFeetYaw, (m_flLastClientSideAnimationUpdateTimeDelta * 100.0f));
+	//}
+	//if (Globals::MissedShots[pEnt->EntIndex()] > 3) {
+	//	switch (Globals::MissedShots[pEnt->EntIndex()] % 4) {
+	//	case 0: pEnt->GetEyeAnglesPointer()->y = pEnt->GetEyeAnglesPointer()->y + 45; break;
+	//	case 1: pEnt->GetEyeAnglesPointer()->y = pEnt->GetEyeAnglesPointer()->y - 45; break;
+	//	case 2: pEnt->GetEyeAnglesPointer()->y = pEnt->GetEyeAnglesPointer()->y - 30; break;
+	//	case 3: pEnt->GetEyeAnglesPointer()->y = pEnt->GetEyeAnglesPointer()->y + 30; break;
+	//	}
+	//}
 }
 
-void HandleHits(C_BaseEntity * pEnt)
+void HandleHits(C_BaseEntity* pEnt)
 {
 	auto NetChannel = g_pEngine->GetNetChannelInfo();
 
@@ -358,6 +370,12 @@ void Resolver::FrameStage(ClientFrameStage_t stage)
 		{
 			HandleHits(pPlayerEntity);
 			AnimationFix(pPlayerEntity);
+			
+			
+		}
+
+		if (stage == FRAME_NET_UPDATE_POSTDATAUPDATE_START) {
+			HandleBackUpResolve(pPlayerEntity);
 		}
 
 		if (stage == FRAME_NET_UPDATE_END && pPlayerEntity != Globals::LocalPlayer)
@@ -366,7 +384,7 @@ void Resolver::FrameStage(ClientFrameStage_t stage)
 			auto VarMapSize = *reinterpret_cast<int*>(VarMap + 20);
 
 			for (auto index = 0; index < VarMapSize; index++)
-				* reinterpret_cast<uintptr_t*>(*reinterpret_cast<uintptr_t*>(VarMap) + index * 12) = 0;
+				*reinterpret_cast<uintptr_t*>(*reinterpret_cast<uintptr_t*>(VarMap) + index * 12) = 0;
 		}
 
 		wasDormant[i] = false;

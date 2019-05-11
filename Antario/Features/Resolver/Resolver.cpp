@@ -111,74 +111,84 @@ void HandleBackUpResolve(C_BaseEntity* pEnt) {
 	if (!player_animation_state)
 		return;
 
-	float m_flLastClientSideAnimationUpdateTimeDelta = fabs(player_animation_state->m_iLastClientSideAnimationUpdateFramecount - player_animation_state->m_flLastClientSideAnimationUpdateTime);
-
-	auto v48 = 0.f;
-
-	if (player_animation_state->m_flFeetSpeedForwardsOrSideWays >= 0.0f)
-	{
-		v48 = fminf(player_animation_state->m_flFeetSpeedForwardsOrSideWays, 1.0f);
+	if (Globals::MissedShots[pEnt->EntIndex()] > 2) {
+		switch (Globals::MissedShots[pEnt->EntIndex()] % 4) {
+				case 0: player_animation_state->m_flGoalFeetYaw = player_animation_state->m_flGoalFeetYaw + 45; break;
+				case 1: player_animation_state->m_flGoalFeetYaw = player_animation_state->m_flGoalFeetYaw - 45; break;
+				case 2: player_animation_state->m_flGoalFeetYaw = player_animation_state->m_flGoalFeetYaw - 30; break;
+				case 3: player_animation_state->m_flGoalFeetYaw = player_animation_state->m_flGoalFeetYaw + 30; break;
+		}
 	}
-	else
-	{
-		v48 = 0.0f;
-	}
+	else {
 
-	float v49 = ((player_animation_state->m_flStopToFullRunningFraction * -0.30000001) - 0.19999999) * v48;
+		float m_flLastClientSideAnimationUpdateTimeDelta = fabs(player_animation_state->m_iLastClientSideAnimationUpdateFramecount - player_animation_state->m_flLastClientSideAnimationUpdateTime);
 
-	float flYawModifier = v49 + 1.0;
+		auto v48 = 0.f;
 
-	if (player_animation_state->m_fDuckAmount > 0.0)
-	{
-		float v53 = 0.0f;
-
-		if (player_animation_state->m_flFeetSpeedUnknownForwardOrSideways >= 0.0)
+		if (player_animation_state->m_flFeetSpeedForwardsOrSideWays >= 0.0f)
 		{
-			v53 = fminf(player_animation_state->m_flFeetSpeedUnknownForwardOrSideways, 1.0);
+			v48 = fminf(player_animation_state->m_flFeetSpeedForwardsOrSideWays, 1.0f);
 		}
 		else
 		{
-			v53 = 0.0f;
+			v48 = 0.0f;
 		}
-	}
 
-	float flMaxYawModifier = player_animation_state->pad10[516] * flYawModifier;
-	float flMinYawModifier = player_animation_state->pad10[512] * flYawModifier;
+		float v49 = ((player_animation_state->m_flStopToFullRunningFraction * -0.30000001) - 0.19999999) * v48;
 
-	float newFeetYaw = 0.f;
+		float flYawModifier = v49 + 1.0;
 
-	auto eyeYaw = player_animation_state->m_flEyeYaw;
-
-	auto lbyYaw = player_animation_state->m_flGoalFeetYaw;
-
-	float eye_feet_delta = fabs(eyeYaw - lbyYaw);
-
-	if (eye_feet_delta <= flMaxYawModifier)
-	{
-		if (flMinYawModifier > eye_feet_delta)
+		if (player_animation_state->m_fDuckAmount > 0.0)
 		{
-			newFeetYaw = fabs(flMinYawModifier) + eyeYaw;
+			float v53 = 0.0f;
+
+			if (player_animation_state->m_flFeetSpeedUnknownForwardOrSideways >= 0.0)
+			{
+				v53 = fminf(player_animation_state->m_flFeetSpeedUnknownForwardOrSideways, 1.0);
+			}
+			else
+			{
+				v53 = 0.0f;
+			}
 		}
+
+		float flMaxYawModifier = player_animation_state->pad10[516] * flYawModifier;
+		float flMinYawModifier = player_animation_state->pad10[512] * flYawModifier;
+
+		float newFeetYaw = 0.f;
+
+		auto eyeYaw = player_animation_state->m_flEyeYaw;
+
+		auto lbyYaw = player_animation_state->m_flGoalFeetYaw;
+
+		float eye_feet_delta = fabs(eyeYaw - lbyYaw);
+
+		if (eye_feet_delta <= flMaxYawModifier)
+		{
+			if (flMinYawModifier > eye_feet_delta)
+			{
+				newFeetYaw = fabs(flMinYawModifier) + eyeYaw;
+			}
+		}
+		else
+		{
+			newFeetYaw = eyeYaw - fabs(flMaxYawModifier);
+		}
+
+		float v136 = fmod(newFeetYaw, 360.0);
+
+		if (v136 > 180.0)
+		{
+			v136 = v136 - 360.0;
+		}
+
+		if (v136 < 180.0)
+		{
+			v136 = v136 + 360.0;
+		}
+
+		player_animation_state->m_flGoalFeetYaw = v136;
 	}
-	else
-	{
-		newFeetYaw = eyeYaw - fabs(flMaxYawModifier);
-	}
-
-	float v136 = fmod(newFeetYaw, 360.0);
-
-	if (v136 > 180.0)
-	{
-		v136 = v136 - 360.0;
-	}
-
-	if (v136 < 180.0)
-	{
-		v136 = v136 + 360.0;
-	}
-
-	player_animation_state->m_flGoalFeetYaw = v136;
-
 	/*static int stored_yaw = 0;
 
 	if (pEnt->GetEyeAnglesPointer()->y != stored_yaw) {
@@ -217,6 +227,7 @@ void HandleHits(C_BaseEntity* pEnt)
 
 	static float predTime[65];
 	static bool init[65];
+
 
 	if (Globals::Shot[pEnt->EntIndex()])
 	{

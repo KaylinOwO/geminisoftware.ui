@@ -4,7 +4,7 @@
 #include "Features\Features.h"
 #include "Menu\Menu.h"
 #include "Features/Visuals/EventLogging.h"
-#include "../std2017.h"
+#include "Features\SkinChanger\Skinchanger.h"
 
 Misc     g_Misc;
 Hooks    g_Hooks;
@@ -368,204 +368,7 @@ void SetViewModelSequence(const CRecvProxyData *pDataConst, void *pStruct, void 
 	fnSequenceProxyFn(pData, pStruct, pOut);
 }
 
-const char* getKnifeModel(bool viewmodel = true)
-{
-	int gay = 9;
-	//
 
-	if (!Globals::LocalPlayer)
-		return "models/weapons/v_knife_default_t.mdl";
-
-
-	switch (c_config::get().knife_model)
-	{
-	case 0:
-		return viewmodel ? Globals::LocalPlayer->GetTeam() == 2 ? "models/weapons/v_knife_default_t.mdl" : "models/weapons/v_knife_default_ct.mdl" : Globals::LocalPlayer->GetTeam() == 2 ? "models/weapons/w_knife_default_t.mdl" : "models/weapons/w_knife_default_ct.mdl";
-		break;
-
-	case 1:
-		return viewmodel ? "models/weapons/v_knife_m9_bay.mdl" : "models/weapons/w_knife_m9_bay.mdl";
-		break;
-
-	case 2:
-		return viewmodel ? "models/weapons/v_knife_bayonet.mdl" : "models/weapons/w_knife_bayonet.mdl";
-		break;
-
-	case 3:
-		return viewmodel ? "models/weapons/v_knife_flip.mdl" : "models/weapons/w_knife_flip.mdl";
-		break;
-
-	case 4:
-		return viewmodel ? "models/weapons/v_knife_gut.mdl" : "models/weapons/w_knife_gut.mdl";
-		break;
-
-	case 5:
-		return viewmodel ? "models/weapons/v_knife_karam.mdl" : "models/weapons/w_knife_karam.mdl";
-		break;
-
-	case 6:
-		return viewmodel ? "models/weapons/v_knife_tactical.mdl" : "models/weapons/w_knife_tactical.mdl";
-		break;
-
-	case 7:
-		return viewmodel ? "models/weapons/v_knife_falchion_advanced.mdl" : "models/weapons/w_knife_falchion_advanced.mdl";
-		break;
-
-	case 8:
-		return viewmodel ? "models/weapons/v_knife_survival_bowie.mdl" : "models/weapons/w_knife_survival_bowie.mdl";
-		break;
-	case 9:
-		return viewmodel ? "models/weapons/v_knife_butterfly.mdl" : "models/weapons/w_knife_butterfly.mdl";
-		break;
-	case 10:
-		return viewmodel ? "models/weapons/v_knife_push.mdl" : "models/weapons/w_knife_push.mdl";
-		break; 	
-	case 11:
-		return viewmodel ? "models/weapons/v_knife_gypsy_jackknife.mdl" : "models/weapons/w_knife_gypsy_jackknife.mdl";
-		break;
-	case 12:
-		return viewmodel ? "models/weapons/v_knife_stiletto.mdl" : "models/weapons/w_knife_stiletto.mdl";
-		break;
-	case 13:
-		return viewmodel ? "models/weapons/v_knife_ursus.mdl" : "models/weapons/w_knife_ursus.mdl";
-		break;
-	case 14:
-		return viewmodel ? "models/weapons/v_knife_widowmaker.mdl" : "models/weapons/2_knife_widowmaker.mdl";
-		break;
-	default:
-		return "";
-		break;
-	}
-}
-
-int getSkin(int shit_to_switch)
-{
-	switch (shit_to_switch)
-	{
-	case 0:
-		return 0;
-		break;
-	case 1:
-		return 3;
-		break;
-	case 2:
-		return 11;
-		break;
-	case 3:
-		return 15;
-		break;
-	case 4:
-		return 39;
-		break;
-	case 5:
-		return 70;
-		break;
-	case 6:
-		return 98;
-		break;
-	case 7:
-		return 156;
-		break;
-	case 8:
-		return 196;
-		break;
-	case 9:
-		return 400;
-		break;
-	case 10:
-		return 419;
-		break;
-	case 11:
-		return 427;
-		break;
-	case 12:
-		return 451;
-		break;
-	case 13:
-		return 572;
-		break;
-	case 14:
-		return 702;
-		break;
-	case 15:
-		return 102;
-		break;
-	case 16:
-		return 312;
-		break;
-	default:
-		return 0;
-		break;
-	}
-}
-
-int getKnifeItemDefinitionIndex()
-{
-	int gay = 9;
-	//
-
-	if (!Globals::LocalPlayer)
-		return 59;
-
-
-	switch (c_config::get().knife_model)
-	{
-	case 0:
-		return Globals::LocalPlayer->GetTeam() == 1 ? 42 : 26;
-		break;
-
-	case 1:
-		return 508;
-		break;
-
-	case 2:
-		return 500;
-		break;
-
-	case 3:
-		return 505;
-		break;
-
-	case 4:
-		return 506;
-		break;
-
-	case 5:
-		return 507;
-		break;
-
-	case 6:
-		return 509; // Huntsman
-		break;
-
-	case 7:
-		return 512;
-		break;
-
-	case 8:
-		return 514;
-		break;
-
-	case 9:
-		return 515;
-		break;
-	case 10:
-		return 516;
-		break;
-	case 11:
-		return 520;
-		break;
-	case 12:
-		return 522;
-		break;
-	case 13:
-		return 519;
-		break;
-	default:
-		return 523;
-		break;
-	}
-}
 
 void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut)
 {
@@ -604,7 +407,7 @@ void Hooked_RecvProxy_Viewmodel(CRecvProxyData *pData, void *pStruct, void *pOut
 			pData->m_Value.m_Int == iDagger ||
 			pData->m_Value.m_Int == iBowie))
 		{
-				pData->m_Value.m_Int = g_pModelInfo->GetModelIndex(getKnifeModel());
+				pData->m_Value.m_Int = g_pModelInfo->GetModelIndex(gSkins.getKnifeModel());
 		}
 	}
 
@@ -887,210 +690,7 @@ bool __fastcall Hooks::CreateMove(IClientMode* thisptr, void* edx, float sample_
 #include <functional>
 #include <utility>
 
-enum ItemDefinitionIndexv2 : int
-{
-	WEAPON_NONE = 0,
 
-	WEAPON_DEAGLE,
-	WEAPON_ELITE,
-	WEAPON_FIVESEVEN,
-	WEAPON_GLOCK,
-	WEAPON_AK47 = 7,
-	WEAPON_AUG,
-	WEAPON_AWP,
-	WEAPON_FAMAS,
-	WEAPON_G3SG1,
-	WEAPON_GALILAR = 13,
-	WEAPON_M249,
-	WEAPON_M4A1 = 16,
-	WEAPON_MAC10,
-	WEAPON_P90 = 19,
-	WEAPON_MP5SD = 23,
-	WEAPON_UMP45,
-	WEAPON_XM1014,
-	WEAPON_BIZON,
-	WEAPON_MAG7,
-	WEAPON_NEGEV,
-	WEAPON_SAWEDOFF,
-	WEAPON_TEC9,
-	WEAPON_TASER,
-	WEAPON_HKP2000,
-	WEAPON_MP7,
-	WEAPON_MP9,
-	WEAPON_NOVA,
-	WEAPON_P250,
-	WEAPON_SHIELD,
-	WEAPON_SCAR20,
-	WEAPON_SG556,
-	WEAPON_SSG08,
-	WEAPON_KNIFEGG,
-	WEAPON_KNIFE,
-	WEAPON_FLASHBANG,
-	WEAPON_HEGRENADE,
-	WEAPON_SMOKEGRENADE,
-	WEAPON_MOLOTOV,
-	WEAPON_DECOY,
-	WEAPON_INCGRENADE,
-	WEAPON_C4,
-	WEAPON_HEALTHSHOT = 57,
-	WEAPON_KNIFE_T = 59,
-	WEAPON_M4A1_SILENCER,
-	WEAPON_USP_SILENCER,
-	WEAPON_CZ75A = 63,
-	WEAPON_REVOLVER,
-	WEAPON_TAGRENADE = 68,
-	WEAPON_FISTS,
-	WEAPON_BREACHCHARGE,
-	WEAPON_TABLET = 72,
-	WEAPON_MELEE = 74,
-	WEAPON_AXE,
-	WEAPON_HAMMER,
-	WEAPON_SPANNER = 78,
-	WEAPON_KNIFE_GHOST = 80,
-	WEAPON_FIREBOMB,
-	WEAPON_DIVERSION,
-	WEAPON_FRAG_GRENADE,
-	WEAPON_SNOWBALL,
-	WEAPON_BUMPMINE,
-	WEAPON_BAYONET = 500,
-	WEAPON_KNIFE_FLIP = 505,
-	WEAPON_KNIFE_GUT,
-	WEAPON_KNIFE_KARAMBIT,
-	WEAPON_KNIFE_M9_BAYONET,
-	WEAPON_KNIFE_TACTICAL,
-	WEAPON_KNIFE_FALCHION = 512,
-	WEAPON_KNIFE_SURVIVAL_BOWIE = 514,
-	WEAPON_KNIFE_BUTTERFLY,
-	WEAPON_KNIFE_PUSH,
-	WEAPON_KNIFE_URSUS = 519,
-	WEAPON_KNIFE_GYPSY_JACKKNIFE,
-	WEAPON_KNIFE_STILETTO = 522,
-	WEAPON_KNIFE_WIDOWMAKER
-};
-bool SetShit = false;
-void NewSkinChanger()
-{
-	if (!Globals::LocalPlayer)
-		return;
-
-	if (Globals::LocalPlayer->IsAlive())
-	{
-		int nLocalPlayerID = g_pEngine->GetLocalPlayer();
-		C_BaseEntity* pLocal = (C_BaseEntity*)g_pEntityList->GetClientEntity(nLocalPlayerID);
-
-
-		auto Weapons = Globals::LocalPlayer->GetWeapons();
-
-		for (int i = 0; i < 64; i++) {
-			if (Weapons[i] == -1)
-				continue;
-
-			C_BaseCombatWeapon* Weap = (C_BaseCombatWeapon*)g_pEntityList->GetClientEntityFromHandle(Weapons[i]);
-
-			if (!Weap || Weap == nullptr)
-				continue;
-
-
-			ClientClass *pClass = g_pClientDll->GetAllClasses();
-
-			auto world_model_handle = Weap->m_hWeaponWorldModel_h();
-
-			const auto world_model = (CBaseWeaponWorldModel*)(g_pEntityList->GetClientEntityFromHandle(world_model_handle));
-
-
-			if (Weap->GetClientClass()->ClassID == (int)EClassIds::CKnife && c_config::get().knife_model > 0)
-			{
-				*Weap->ItemDefinitionIndex2() = getKnifeItemDefinitionIndex();
-				Weap->SetModelIndex(g_pModelInfo->GetModelIndex(getKnifeModel()));
-
-				if (world_model) {
-					*world_model->GetModelIndex() = g_pModelInfo->GetModelIndex(getKnifeModel(false));
-				}
-				
-				Weap->GetItemIDLow() = -1;
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().knife_skin);
-				*Weap->FallbackWear() = 0.00000000001;
-			}
-
-			switch (Weap->GetItemDefinitionIndex()) {
-			case ItemDefinitionIndex::WEAPON_SSG08: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().ssg08_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			}break;
-			case ItemDefinitionIndex::WEAPON_SCAR20: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().scar20_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_G3SG1: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().g3sg1_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_AK47: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().ak47_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_M4A1: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().m4a4_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_M4A1_SILENCER: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().m4a1_s_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_CZ75A: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().cz75_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_DEAGLE: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().deagle_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			case ItemDefinitionIndex::WEAPON_REVOLVER: {
-				Weap->GetItemIDHigh() = -1;
-				*Weap->GetFallbackPaintKit() = getSkin(c_config::get().r8_skin);
-				*Weap->FallbackSeed() = 0;
-				*Weap->OwnerXuidLow() = 0;
-				*Weap->OwnerXuidHigh() = 0;
-				*Weap->FallbackWear() = 0.00000000001;
-			} break;
-			}
-
-		}
-	}
-}
 struct hud_weapons_t {
 	std::int32_t* get_weapon_count() {
 		return reinterpret_cast<std::int32_t*>(std::uintptr_t(this) + 0x80);
@@ -1251,10 +851,8 @@ void __stdcall Hooks::FrameStageNotify(ClientFrameStage_t curStage)
 	static int stored_revolver_shit = 0;
 	if (stored_shit != c_config::get().knife_model || stored_skin_knife_shot != c_config::get().knife_skin || stored_ssg_shit != c_config::get().ssg08_skin || stored_scar20_shit != c_config::get().scar20_skin || stored_g3sg1_shit != c_config::get().g3sg1_skin || stored_ak47_shit != c_config::get().ak47_skin || stored_cz75_shit != c_config::get().cz75_skin || stored_deagle_shit != c_config::get().deagle_skin || stored_revolver_shit != c_config::get().r8_skin | stored_m4a1_shit != c_config::get().m4a4_skin | stored_m4a1s_shit != c_config::get().m4a1_s_skin) {
 		if (g_pEngine->IsInGame() && g_pEngine->IsConnected() && Globals::LocalPlayer && Globals::LocalPlayer->IsAlive() && Globals::LocalPlayer->GetActiveWeapon())
-		{
 			KnifeApplyCallbk();
-			SetShit = true;
-		}
+
 		stored_shit = c_config::get().knife_model;
 		stored_skin_knife_shot = c_config::get().knife_skin;
 		stored_ssg_shit = c_config::get().ssg08_skin;
@@ -1269,7 +867,7 @@ void __stdcall Hooks::FrameStageNotify(ClientFrameStage_t curStage)
 	}
 	if (curStage == FRAME_NET_UPDATE_POSTDATAUPDATE_START)
 	{
-		NewSkinChanger();
+		gSkins.Run();
 
 		if (Globals::LocalPlayer && Globals::LocalPlayer->IsAlive()) {
 			backtracking->Update(g_pGlobalVars->tickcount);

@@ -7,7 +7,6 @@
 #include <ctime>
 #include <fstream>
 #include <string>
-#include "Features/SkinChanger/KnifeHandler.h"
 
 inline float RandomFloat(float min, float max) {
 	static auto fn = (decltype(&RandomFloat))(GetProcAddress(GetModuleHandle("vstdlib.dll"), "RandomFloat"));

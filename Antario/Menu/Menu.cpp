@@ -983,8 +983,6 @@ void Menu::Render()
 
 		combobox(3, "Keybind", KeyBindList, &CurrentKeybind);
 
-		static int gay23 = 0;
-
 		switch (CurrentKeybind)
 		{
 		case 0: keybind(&c_config::get().thirdperson_bind, "a");

@@ -998,8 +998,8 @@ void Menu::Render()
 		};
 
 		std::string weapon_options[10] = {
-			"Knife",
-			"Scar20",
+			"KNIFE",
+			"SCAR20",
 			"G3SG1",
 			"SSG08",
 			"AK47",

@@ -127,6 +127,8 @@ public:
 	static void     __fastcall  DrawModelExecute(void* ecx, void* edx, IMatRenderContext* context, const DrawModelState_t& state, const ModelRenderInfo_t& render_info, matrix3x4_t* matrix);
 	static void     __fastcall  DoExtraBonesProcessing(void * ECX, void * EDX, void * unkn1, void * unkn2, void * unkn3, void * unkn4, CBoneBitList & unkn5, void * unkn6);
 	static bool __fastcall SendNetMsg(NetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice);
+	static void __stdcall UpdateConfig(bool bForceUpdate);
+	static void __stdcall OverrideConfig(MaterialSystem_Config_t& config, bool bForceUpdate);
 private:
     /*---------------------------------------------*/
     /*-------------VMT Hook pointers---------------*/

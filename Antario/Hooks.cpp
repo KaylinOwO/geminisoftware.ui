@@ -658,6 +658,7 @@ void ApplyAAAHooks()
 namespace StoredLocalPlayer {
 	Vector StoredOrigin;
 }
+
 void Hooks::Init()
 {
     // Get window handle

@@ -92,6 +92,7 @@ void CConfig::Setup()
 	SetupValue(c_config::get().visuals_enabled, false, "Visuals", "Enabled");
 	SetupValue(c_config::get().fov, 0, "Visuals", "Fov");
 	SetupValue(c_config::get().nightmode, false, "Visuals", "Nightmode");
+	SetupValue(c_config::get().visuals_bullet_tracers, false, "Visuals", "Bullet Tracer");
 	SetupValue(c_config::get().remove_scope, false, "Visuals", "Remove_scope"); 
 	SetupValue(c_config::get().hitmarker, false, "Visuals", "hitmarker");
 	SetupValue(c_config::get().hitmarker_sound, 0, "Visuals", "hitmarker_sound");
@@ -191,6 +192,11 @@ void CConfig::Setup()
 	SetupValue(c_config::get().draw_hit_player_esp_color_g, 255, "Visuals", "draw_hit_player_esp_color_g");
 	SetupValue(c_config::get().draw_hit_player_esp_color_b, 255, "Visuals", "draw_hit_player_esp_color_b");
 	SetupValue(c_config::get().draw_hit_player_esp_color_a, 255, "Visuals", "draw_hit_player_esp_color_a");
+
+	SetupValue(c_config::get().bullet_tracers_color_r, 255, "Visuals", "bullet_tracers_color_r");
+	SetupValue(c_config::get().bullet_tracers_color_g, 255, "Visuals", "bullet_tracers_color_g");
+	SetupValue(c_config::get().bullet_tracers_color_b, 255, "Visuals", "bullet_tracers_color_b");
+	SetupValue(c_config::get().bullet_tracers_color_a, 255, "Visuals", "bullet_tracers_color_a");
 	
 	SetupValue(c_config::get().misc_bhop, false, "Misc", "Bunny_hop");
 	SetupValue(c_config::get().misc_autostrafe, false, "Misc", "Auto_strafe");

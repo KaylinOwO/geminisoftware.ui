@@ -895,9 +895,9 @@ void Menu::Render()
 				slider(100, "Distance", &c_config::get().fov_arrows_enemy_distance, "%", 1);
 				checkbox("Always indicate player", &c_config::get().fov_arrows_always_indicate);
 			}
-			checkbox("Bullet Tracers", &c_config::get().visuals_bullet_tracers);
 			color_selector("bullet_tracer_color", &c_config::get().bullet_tracers_color_r, &c_config::get().bullet_tracers_color_g,
 				&c_config::get().bullet_tracers_color_b, &c_config::get().bullet_tracers_color_a);
+			checkbox("Bullet Tracers", &c_config::get().visuals_bullet_tracers);
 		}
 		else if (current_players_esp_subtab == 2)
 		{

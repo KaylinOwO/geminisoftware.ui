@@ -78,16 +78,13 @@
     <ClCompile Include="Antario\Features\Legit Aimbot\Legit Aimbot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Antario\Features\SkinChanger\KnifeHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Antario\Features\SkinChanger\SkinChangerDefinitions.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Antario\Features\GrenadePrediction\GrenadePrediction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Antario\SDK\CHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Antario\Features\SkinChanger\Skinchanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -398,16 +395,13 @@
     <ClInclude Include="Antario\Features\Legit Aimbot\Legit Aimbot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\Features\SkinChanger\KnifeHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Antario\Features\SkinChanger\SkinChangerDefinitions.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Antario\Features\GrenadePrediction\GrenadePrediction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="std2017.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Antario\Features\SkinChanger\Skinchanger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

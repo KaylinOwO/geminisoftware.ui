@@ -146,8 +146,7 @@
     <ClCompile Include="Antario\Features\GrenadePrediction\GrenadePrediction.cpp" />
     <ClCompile Include="Antario\Features\Legit Aimbot\Legit Aimbot.cpp" />
     <ClCompile Include="Antario\Features\Resolver\Resolver.cpp" />
-    <ClCompile Include="Antario\Features\SkinChanger\KnifeHandler.cpp" />
-    <ClCompile Include="Antario\Features\SkinChanger\SkinChangerDefinitions.cpp" />
+    <ClCompile Include="Antario\Features\SkinChanger\Skinchanger.cpp" />
     <ClCompile Include="Antario\Features\Visuals\EventLogging.cpp" />
     <ClCompile Include="Antario\Hooks.cpp" />
     <ClCompile Include="Antario\DLLMain.cpp" />
@@ -175,8 +174,7 @@
     <ClInclude Include="Antario\Features\Legit Aimbot\Legit Aimbot.h" />
     <ClInclude Include="Antario\Features\Misc\Misc.h" />
     <ClInclude Include="Antario\Features\Resolver\Resolver.h" />
-    <ClInclude Include="Antario\Features\SkinChanger\KnifeHandler.h" />
-    <ClInclude Include="Antario\Features\SkinChanger\SkinChangerDefinitions.h" />
+    <ClInclude Include="Antario\Features\SkinChanger\Skinchanger.h" />
     <ClInclude Include="Antario\Features\Visuals\EventLogging.h" />
     <ClInclude Include="Antario\Hooks.h" />
     <ClInclude Include="Antario\Menu.h" />

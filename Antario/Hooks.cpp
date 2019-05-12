@@ -10,6 +10,9 @@ Misc     g_Misc;
 Hooks    g_Hooks;
 Event    g_Event;
 c_nade_prediction g_nadepred;
+
+std::vector<trace_info> trace_logs;
+
 void SinCos(float radian, float* sin, float* cos)
 {
 	*sin = std::sin(radian);
@@ -825,6 +828,34 @@ void KnifeApplyCallbk()
 	CL_FullUpdate();
 }
 
+void DrawBeam(Vector src, Vector end, Color color)
+{
+	BeamInfo_t beamInfo;
+	beamInfo.m_nType = TE_BEAMTESLA;
+	beamInfo.m_pszModelName = "sprites/purplelaser1.vmt";
+	beamInfo.m_nModelIndex = -1;
+	beamInfo.m_flHaloScale = 0.0f;
+	beamInfo.m_flLife = 3.0f;
+	beamInfo.m_flWidth = 2.0f;
+	beamInfo.m_flEndWidth = 2.0f;
+	beamInfo.m_flFadeLength = 0.0f;
+	beamInfo.m_flAmplitude = 2.0f;
+	beamInfo.m_flBrightness = color.alpha;
+	beamInfo.m_flSpeed = 0.2f;
+	beamInfo.m_nStartFrame = 0;
+	beamInfo.m_flFrameRate = 0.f;
+	beamInfo.m_flRed = color.red;
+	beamInfo.m_flGreen = color.green;
+	beamInfo.m_flBlue = color.blue;
+	beamInfo.m_nSegments = 2;
+	beamInfo.m_bRenderable = true;
+	beamInfo.m_vecStart = src;
+	beamInfo.m_vecEnd = end;
+	Beam_t* myBeam = g_pRenderBeams->CreateBeamPoints(beamInfo);
+	if (myBeam)
+		g_pRenderBeams->DrawBeam(myBeam);
+}
+
 void __stdcall Hooks::FrameStageNotify(ClientFrameStage_t curStage)
 {
 	static auto oFrameStage = g_Hooks.pClientHook->GetOriginal<FrameStageNotify_t>(vtable_indexes::frameStage);
@@ -871,6 +902,28 @@ void __stdcall Hooks::FrameStageNotify(ClientFrameStage_t curStage)
 
 		if (Globals::LocalPlayer && Globals::LocalPlayer->IsAlive()) {
 			backtracking->Update(g_pGlobalVars->tickcount);
+		}
+	}
+	if (curStage == FRAME_NET_UPDATE_START)
+	{
+		if (g_pEngine->IsInGame() && g_pEngine->IsConnected())
+		{
+			if (c_config::get().visuals_bullet_tracers)
+			{
+			//	float Red, Green, Blue;
+			//	Red = [0] * 255;
+			//	Green = Vars.Visuals.Colors.BulletTracers[1] * 255;
+			//	Blue = Vars.Visuals.Colors.BulletTracers[2] * 255;
+				Color bullet_tracer_color = Color(c_config::get().bullet_tracers_color_r, c_config::get().bullet_tracers_color_g, c_config::get().bullet_tracers_color_b, c_config::get().bullet_tracers_color_a);
+				for (unsigned int i = 0; i < trace_logs.size(); i++)
+				{
+					auto *shooter = g_pEntityList->GetClientEntity(g_pEngine->GetPlayerForUserID(trace_logs[i].userid));
+					if (!shooter)
+						return;
+					DrawBeam(trace_logs[i].start, trace_logs[i].position, bullet_tracer_color);
+					trace_logs.erase(trace_logs.begin() + i);
+				}
+			}
 		}
 	}
 
@@ -1569,6 +1622,21 @@ void Event::FireGameEvent(IGameEvent* event)
 	}
 	else if (strstr(event->GetName(), "item_purchase")) {
 		c_event_logs::get().event_item_purchase(event);
+	}
+	else if (strstr(event->GetName(), "bullet_impact"))
+	{
+		if (c_config::get().visuals_bullet_tracers)
+		{
+			auto* index = g_pEntityList->GetClientEntity(g_pEngine->GetPlayerForUserID(event->GetInt("userid")));
+
+			if (Globals::LocalPlayer)
+			{
+				Vector position(event->GetFloat("x"), event->GetFloat("y"), event->GetFloat("z"));
+
+				if (index)
+					trace_logs.push_back(trace_info(index->GetEyePosition(), position, g_pGlobalVars->curtime, event->GetInt("userid")));
+			}
+		}
 	}
 };
 

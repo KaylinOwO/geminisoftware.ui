@@ -46,6 +46,25 @@ public:
 };
 extern Event g_Event;
 
+class trace_info
+{
+public:
+	trace_info(Vector starts, Vector positions, float times, int userids)
+	{
+		this->start = starts;
+		this->position = positions;
+		this->time = times;
+		this->userid = userids;
+	}
+
+	Vector position;
+	Vector start;
+	float time;
+	int userid;
+};
+
+extern std::vector<trace_info> trace_logs;
+
 struct impact_info {
 	float x, y, z;
 	long long time;

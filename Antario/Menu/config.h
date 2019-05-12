@@ -80,6 +80,7 @@ public:
 	bool remove_visual_recoil = false;
 	bool draw_spread = false;
 	bool ragdoll_launcher = false;
+	bool visuals_bullet_tracers = false;
 	/*
 	Enemies
 	*/
@@ -154,6 +155,7 @@ public:
 	int local_chams_color_r = 255, local_chams_color_g = 255, local_chams_color_b = 255, local_chams_color_a = 255;
 	int local_glow_color_r = 255, local_glow_color_g = 255, local_glow_color_b = 255, local_glow_color_a = 255;
 	int hand_chams_color_r = 255, hand_chams_color_g = 255, hand_chams_color_b = 255, hand_chams_color_a = 255;
+	int bullet_tracers_color_r = 255, bullet_tracers_color_g = 255, bullet_tracers_color_b = 255, bullet_tracers_color_a = 255;
 	bool event_logger[3] = { false, false, false };
 	bool visual_preserve_killfeed = false;
 	bool visual_spectator_list = false;

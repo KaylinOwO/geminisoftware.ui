@@ -895,9 +895,6 @@ void Menu::Render()
 				slider(100, "Distance", &c_config::get().fov_arrows_enemy_distance, "%", 1);
 				checkbox("Always indicate player", &c_config::get().fov_arrows_always_indicate);
 			}
-			color_selector("bullet_tracer_color", &c_config::get().bullet_tracers_color_r, &c_config::get().bullet_tracers_color_g,
-				&c_config::get().bullet_tracers_color_b, &c_config::get().bullet_tracers_color_a);
-			checkbox("Bullet Tracers", &c_config::get().visuals_bullet_tracers);
 		}
 		else if (current_players_esp_subtab == 2)
 		{
@@ -923,6 +920,23 @@ void Menu::Render()
 		}
 
 		static int current_other_esp_subtab = 0;
+
+
+
+		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, TopLeftGroupBox_Y, GroupBoxSize_Width, GroupBoxSize_Height,
+			"test");
+		slider(135, "Field Of View", &c_config::get().fov, "°", 1);
+		checkbox("Retain FOV When Scoped", &c_config::get().fov_while_zoomed);
+		slider(135, "Viewmodel Field Of View", &c_config::get().viewmodel_fov, "°", 1);
+
+		checkbox("Nightmode", &c_config::get().nightmode);
+		checkbox("Transparent Props", &c_config::get().transparent_props);
+		slider(135, "Thirdperson Distance", &c_config::get().thirdperson_distance, "°", 1);
+		checkbox("Remove Visual Recoil", &c_config::get().remove_visual_recoil);
+		std::string nosmoke_type[3] = { "Disabled", "No Draw", "Wireframe" };
+		checkbox("No Smoke", &c_config::get().no_smoke);
+		checkbox("No Flash", &c_config::get().remove_flash);
+
 		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, 52, GroupBoxSize_Width, GroupBoxSize_Height, "test", false, true);
 		DrawESPOthersSubtab(current_other_esp_subtab, 2, _pos, MenuAlpha_Main);
 
@@ -950,24 +964,12 @@ void Menu::Render()
 			if (c_config::get().draw_hit_player) {
 				slider(10, "Player Hit Visualization Duration", &c_config::get().hit_player_duration, "S", 1);
 			}
+			color_selector("bullet_tracer_color", &c_config::get().bullet_tracers_color_r, &c_config::get().bullet_tracers_color_g,
+				&c_config::get().bullet_tracers_color_b, &c_config::get().bullet_tracers_color_a);
+			checkbox("Bullet Tracers", &c_config::get().visuals_bullet_tracers);
 		}break;
 		}
 
-
-
-		groupbox(TopLeftGroupBox_X + GroupBoxSize_Width + 5, TopLeftGroupBox_Y, GroupBoxSize_Width, GroupBoxSize_Height,
-			"test");
-		slider(135, "Field Of View", &c_config::get().fov, "°", 1);
-		checkbox("Retain FOV When Scoped", &c_config::get().fov_while_zoomed);
-		slider(135, "Viewmodel Field Of View", &c_config::get().viewmodel_fov, "°", 1);
-
-		checkbox("Nightmode", &c_config::get().nightmode);
-		checkbox("Transparent Props", &c_config::get().transparent_props);
-		slider(135, "Thirdperson Distance", &c_config::get().thirdperson_distance, "°", 1);
-		checkbox("Remove Visual Recoil", &c_config::get().remove_visual_recoil);
-		std::string nosmoke_type[3] = { "Disabled", "No Draw", "Wireframe" };
-		checkbox("No Smoke", &c_config::get().no_smoke);
-		checkbox("No Flash", &c_config::get().remove_flash);
 	}
 
 	else if (tab_selected == 4)

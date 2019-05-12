@@ -81,7 +81,6 @@ void c_visuals::BoxESP(C_BaseEntity* Entity) {
 				g_pSurface->OutlinedRect(x2, y, width, height, ESP);
 				g_pSurface->OutlinedRect(x2 - 1, y - 1, width + 2, height + 2, ESP2);
 				g_pSurface->OutlinedRect(x2 + 1, y + 1, width - 2, height - 2, ESP2);
-				g_pSurface->FilledRect(x2 + 1, y + 1, width - 2, height - 2, Color(0, 0 ,0, 155));
 		}
 		
 	}

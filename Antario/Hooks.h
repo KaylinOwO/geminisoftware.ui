@@ -13,6 +13,7 @@
 #include "SDK\IVRenderBeams.h"
 #include "SDK\CGlowObjectManager.h"
 #include <assert.h>
+#include <d3d9.h>
 
 
 namespace vtable_indexes
@@ -26,6 +27,9 @@ namespace vtable_indexes
 	constexpr auto sceneEnd = 9;
 	constexpr auto dme = 21;
 	constexpr auto extraBonePro = 192;
+	constexpr auto end_scene = 42;
+	constexpr auto end_scene_reset = 16;
+	constexpr auto unk3 = 17;
 }
 
 class Event : public IGameEventListener
@@ -148,6 +152,8 @@ public:
 	static bool __fastcall SendNetMsg(NetChannel* pNetChan, void* edx, INetMessage& msg, bool bForceReliable, bool bVoice);
 	static void __stdcall UpdateConfig(bool bForceUpdate);
 	static void __stdcall OverrideConfig(MaterialSystem_Config_t& config, bool bForceUpdate);
+	static void     __stdcall   Hooked_EndScene(IDirect3DDevice9* pDevice);
+	static void     __stdcall   Hooked_EndScene_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 private:
     /*---------------------------------------------*/
     /*-------------VMT Hook pointers---------------*/
@@ -160,7 +166,9 @@ private:
 	std::unique_ptr<VMTHook> pRenderViewHook;
 	std::unique_ptr<ShadowVTManager> pPlayerHook[65];
 	std::unique_ptr<VMTHook> pModelHook;
+	std::unique_ptr<VMTHook> pD3d9Hook;
 
+	std::unique_ptr<VMTHook> D3DHook;
     /*---------------------------------------------*/
     /*-------------Hook prototypes-----------------*/
     /*---------------------------------------------*/
@@ -174,6 +182,8 @@ private:
 	typedef void(__fastcall* SceneEnd_t) (void*, void*);
 	typedef void(__thiscall* DrawModelExecute_t) (void*, IMatRenderContext*, const DrawModelState_t&, const ModelRenderInfo_t&, matrix3x4_t*);
 	typedef void(__thiscall* ExtraBoneProcess_t) (void*, void*, void*, void*, void*, CBoneBitList&, void*);
+	typedef void(__stdcall* EndSceneFn)(IDirect3DDevice9* device);
+	typedef void(__stdcall* EndSceneResetFn)(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 private:
     HWND                           hCSGOWindow             = nullptr; // CSGO window handle
     bool                           bInitializedDrawManager = false;   // Check if we initialized our draw manager

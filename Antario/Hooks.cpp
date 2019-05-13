@@ -509,6 +509,8 @@ void Hooks::Init()
 
     Utils::Log("Hooking in progress...");
 
+	DWORD shaderapidx9 = **(DWORD * *)(Utils::FindSignature("shaderapidx9.dll", "A1 ?? ?? ?? ?? 50 8B 08 FF 51 0C") + 1);
+
     // VMTHooks
 	g_Hooks.pClientHook     = std::make_unique<VMTHook>(g_pClientDll);
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
@@ -516,6 +518,7 @@ void Hooks::Init()
 	g_Hooks.pPanelHook		= std::make_unique<VMTHook>(g_pPanel);
 	g_Hooks.pRenderViewHook = std::make_unique<VMTHook>(g_pRenderView);
 	g_Hooks.pModelHook = std::make_unique<VMTHook>(g_pModelRender);
+	g_Hooks.D3DHook = std::make_unique<VMTHook>((DWORD**)shaderapidx9);
 
     // Hook the table functions
 	g_Hooks.pClientHook    ->Hook(vtable_indexes::frameStage, Hooks::FrameStageNotify);
@@ -526,6 +529,8 @@ void Hooks::Init()
 	g_Hooks.pPanelHook	   ->Hook(vtable_indexes::paint, Hooks::PaintTraverse);
 	g_Hooks.pModelHook->Hook(vtable_indexes::dme, Hooks::DrawModelExecute);
 	g_Hooks.pRenderViewHook->Hook(vtable_indexes::sceneEnd, Hooks::SceneEnd);
+	g_Hooks.D3DHook->Hook(vtable_indexes::end_scene, Hooks::Hooked_EndScene);
+	g_Hooks.D3DHook->Hook(vtable_indexes::end_scene_reset, Hooks::Hooked_EndScene_Reset);
 
 	g_Event.Init();
 
@@ -547,6 +552,19 @@ void Hooks::Init()
 //	g_pEngine->ExecuteClientCmd("play ambient\\playonce\\weather\\thunder4.wav");
     Utils::Log("Hooking completed!");
 }
+
+void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
+{
+	static auto oEndScene = g_Hooks.D3DHook->GetOriginal<EndSceneFn>(vtable_indexes::end_scene);
+	oEndScene(pDevice);
+}
+
+void __stdcall Hooks::Hooked_EndScene_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
+{
+	static auto oEndSceneReset = g_Hooks.D3DHook->GetOriginal<EndSceneResetFn>(vtable_indexes::end_scene_reset);
+	oEndSceneReset(pDevice, pPresentationParameters);
+}
+
 #include "SDK/Hitboxes.h"
 void RenderSkeleton(C_BaseEntity* pEnt, matrix3x4_t *matrix, Color skelecolor) // the best
 {

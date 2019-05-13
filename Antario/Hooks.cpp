@@ -589,26 +589,40 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xffffffff);
 
 		ImGui_ImplDX9_NewFrame();
-		static int curTab = 1;
-		static int legit_aimbot_sub_curTab = 1;
-		static int rage_aimbot_sub_curTab = 1;
-		static int visuals_sub_curTab = 1;
 
-		if (g_Menu.menuOpened) {
 
+		if (g_Menu.menuOpened)
+		{
+			static int curTab = 1;
+			static int legit_aimbot_sub_curTab = 1;
+			static int rage_aimbot_sub_curTab = 1;
+			static int visuals_sub_curTab = 1;
+
+			/*Aim*/
+			const char* pitch[] = { "Disabled", "Down", "Up", "Origin", "Offset" };
+			const char* BodyAimOptions[] = { "In Air", "Slow Walk", "High Inaccuracy", "Vulnerable", "Lethal" };
+			const char* HitboxOptionz[] = { "Hitscan", "Head Only" };
+			const char* AutoStopOptions[] = { "Minimum Speed", "Full Stop" };
+			const char* BodyAimModeOptions[] = { "Prefer", "Force" };
+
+			/*Visuals*/
+			const char* WireFrameHands[] = { "Disabled", "Invisible", "Chams" };
+			const char* EventLogsOptions[] = { "Weapon Purchase", "Player Hurt", "Player Killed" };
+			const char* Health_Type[] = { "Disabled", "Normal", "Battery" };
+			const char* Hitmarker_Type[] = { "Disabled", "Arena Switch", "Custom" };
 
 			ImGuiIO& io = ImGui::GetIO();
 
 			int pX, pY;
 			POINT mp;
 			GetCursorPos(&mp);
-			
+
 			io.MousePos.x = mp.x;
 			io.MousePos.y = mp.y;
 
 			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(450, 300), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
-				if(ImGui::BeginChild("##Tabs", ImVec2(75, 0))){
+				if (ImGui::BeginChild("##Tabs", ImVec2(75, 0))) {
 					if (ImGui::Button("Legit Aim", ImVec2(75, 0))) {
 						curTab = 1;
 					}
@@ -638,7 +652,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
 
-						switch (rage_aimbot_sub_curTab) {
+						switch (legit_aimbot_sub_curTab) {
 						case 1: {
 							ImGui::Checkbox("Enabled", &c_config::get().legit_aimbot_enabled);
 							ImGui::Checkbox("Position Adjustment", &c_config::get().legit_aimbot_backtrack);
@@ -694,11 +708,28 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 							ImGui::Checkbox("Remove Recoil", &c_config::get().aimbot_norecoil);
 							ImGui::Checkbox("Fakelag Prediction", &c_config::get().fakelag_prediction);
 							ImGui::Checkbox("Auto Stop", &c_config::get().autostop);
+							ImGui::SameLine();
+							if (c_config::get().autostop) ImGui::Combo("##autostopopt", &c_config::get().autostop_mode, AutoStopOptions, ARRAYSIZE(AutoStopOptions));
+							if (c_config::get().autostop) ImGui::Checkbox("Stop Between Shots", &c_config::get().stop_inbetween_shots);
+							ImGui::Checkbox("Auto Scope", &c_config::get().auto_scope);
+							ImGui::Checkbox("Auto Revolver", &c_config::get().autorevolver);
+							ImGui::Checkbox("Accuracy Boost", &c_config::get().accuracy_boost);
+
+							ImGui::Spacing();
+							ImGui::Spacing();
+
+							ImGui::Checkbox("Resolver", &c_config::get().aimbot_resolver);
 						}break;
 						case 2: {
-
+							ImGui::SliderInt("Head Scale", &c_config::get().aimbot_headpointscale, 0, 100);
+							ImGui::SliderInt("Body Scale", &c_config::get().aimbot_bodypointscale, 0, 100);
 						}break;
 						case 3: {
+
+							/*MultiComboBox(5, "Body-Aim", BodyAimOptions, c_config::get().prefer_bodyaim);
+							combobox(2, "Body-Aim Mode", BodyAimModeOptions, &c_config::get().bodyaim_mode);*/
+							ImGui::SliderInt("Baim < X Health", &c_config::get().bodyaim_health, 0, 101);
+							ImGui::SliderInt("Baim After X Missed Shots", &c_config::get().bodyaim_shots, 0, 10);
 
 						}break;
 						}
@@ -726,7 +757,20 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 						switch (rage_aimbot_sub_curTab) {
 						case 1: {
-
+							ImGui::Checkbox("Enabled", &c_config::get().visuals_enabled);
+							//	color_selector("name_col", &c_config::get().name_esp_color_r, &c_config::get().name_esp_color_g,
+							//		&c_config::get().name_esp_color_b, &c_config::get().name_esp_color_a);
+							ImGui::Checkbox("Name", &c_config::get().name_enemies);
+							//color_selector("box_col", &c_config::get().box_esp_color_r, &c_config::get().box_esp_color_g,
+							//	&c_config::get().box_esp_color_b, &c_config::get().box_esp_color_a);
+							ImGui::Checkbox("Bounding Box", &c_config::get().box_enemies);
+							ImGui::Combo("Health", &c_config::get().health_enemies, Health_Type, ARRAYSIZE(Health_Type));
+							//	color_selector("weapon_col", &c_config::get().weapon_esp_color_r, &c_config::get().weapon_esp_color_g,
+							//		&c_config::get().weapon_esp_color_b, &c_config::get().weapon_esp_color_a);
+							ImGui::Checkbox("Weapon", &c_config::get().weapon_enemies);
+							if (c_config::get().weapon_enemies) ImGui::Checkbox("Show Icon When Possible", &c_config::get().show_icon_when_possible_enemies);
+							ImGui::Checkbox("Flags", &c_config::get().flags_enemy);
+							ImGui::Checkbox("Ammo", &c_config::get().ammo_enemy);
 						}break;
 						}
 

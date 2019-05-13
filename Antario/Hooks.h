@@ -12,6 +12,8 @@
 #include "SDK\IVRenderView.h"
 #include "SDK\IVRenderBeams.h"
 #include "SDK\CGlowObjectManager.h"
+#include "ImGui/imgui.h"
+#include "ImGui/dx9/imgui_dx9.h"
 #include <assert.h>
 #include <d3d9.h>
 

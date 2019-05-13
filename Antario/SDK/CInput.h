@@ -352,6 +352,11 @@ public:
 		typedef void(__thiscall* OriginalFn)(void*, bool);
 		return Utils::GetVFunc<OriginalFn>(this, 11)(this, bEnable);
 	}
+	void IInputSystem::GetCursorPosition(int* m_pX, int* m_pY)
+	{
+		typedef void(__thiscall * OriginalFn)(void*, int*, int*);
+		return Utils::GetVFunc< OriginalFn >(this, 56)(this, m_pX, m_pY);
+	}
 };
 extern IInputSystem*		  g_InputSystem;
 

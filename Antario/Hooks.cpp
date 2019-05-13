@@ -5,6 +5,7 @@
 #include "Menu\Menu.h"
 #include "Features/Visuals/EventLogging.h"
 #include "Features\SkinChanger\Skinchanger.h"
+#include "ImGui/dx9/imgui_dx9.h"
 
 Misc     g_Misc;
 Hooks    g_Hooks;
@@ -553,16 +554,76 @@ void Hooks::Init()
     Utils::Log("Hooking completed!");
 }
 
+IDirect3DStateBlock9* m_pStateBlockDraw;
+IDirect3DStateBlock9* m_pStateBlockText;
+DWORD					dwOld_D3DRS_COLORWRITEENABLE;
+#include <intrin.h>
+
 void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 {
 	static auto oEndScene = g_Hooks.D3DHook->GetOriginal<EndSceneFn>(vtable_indexes::end_scene);
+
+	if (!g_Menu.D3DInit)
+		g_Menu.GUI_Init(pDevice);
+
+	ImGui::GetIO().MouseDrawCursor = false;
+
+	static void* dwReturnAddress = _ReturnAddress();
+
+	if (dwReturnAddress == _ReturnAddress())
+	{
+		pDevice->CreateStateBlock(D3DSBT_ALL, &m_pStateBlockDraw);
+		pDevice->CreateStateBlock(D3DSBT_ALL, &m_pStateBlockText);
+
+		if (m_pStateBlockDraw)
+			m_pStateBlockDraw->Capture();
+
+		pDevice->GetRenderState(D3DRS_COLORWRITEENABLE, &dwOld_D3DRS_COLORWRITEENABLE);
+		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xffffffff);
+
+		ImGui_ImplDX9_NewFrame();
+
+		if (g_Menu.menuOpened) {
+
+			int pX, pY;
+			g_InputSystem->GetCursorPosition(&pX, &pY);
+			ImGuiIO& io = ImGui::GetIO();
+			io.MousePos.x = (float)(pX);
+			io.MousePos.y = (float)(pY);
+
+			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(230, 141), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			{
+			}
+		}
+
+		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, dwOld_D3DRS_COLORWRITEENABLE);
+
+		if (m_pStateBlockDraw)
+		{
+			m_pStateBlockDraw->Apply();
+			m_pStateBlockDraw->Release();
+		}
+
+		if (m_pStateBlockText)
+			m_pStateBlockText->Release();
+	}
+	ImGui::Render();
 	oEndScene(pDevice);
 }
 
 void __stdcall Hooks::Hooked_EndScene_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
 	static auto oEndSceneReset = g_Hooks.D3DHook->GetOriginal<EndSceneResetFn>(vtable_indexes::end_scene_reset);
-	oEndSceneReset(pDevice, pPresentationParameters);
+
+	if (!g_Menu.D3DInit)
+		return oEndSceneReset(pDevice, pPresentationParameters);
+
+	ImGui_ImplDX9_InvalidateDeviceObjects();
+
+	auto hr = oEndSceneReset;
+	ImGui_ImplDX9_CreateDeviceObjects();
+
+	return hr(pDevice, pPresentationParameters);
 }
 
 #include "SDK/Hitboxes.h"
@@ -1735,6 +1796,7 @@ void __fastcall Hooks::LockCursor(ISurface* thisptr, void* edx)
 
     g_pSurface->UnLockCursor();
 }
+extern LRESULT ImGui_ImplDX9_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1767,6 +1829,75 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             return true;
         }
     }
+
+	switch (uMsg)
+	{
+	case WM_LBUTTONDOWN:
+		Globals::PressedKeys[VK_LBUTTON] = true;
+		break;
+	case WM_LBUTTONUP:
+		Globals::PressedKeys[VK_LBUTTON] = false;
+		break;
+	case WM_RBUTTONDOWN:
+		Globals::PressedKeys[VK_RBUTTON] = true;
+		break;
+	case WM_RBUTTONUP:
+		Globals::PressedKeys[VK_RBUTTON] = false;
+		break;
+	case WM_MBUTTONDOWN:
+		Globals::PressedKeys[VK_MBUTTON] = true;
+		break;
+	case WM_MBUTTONUP:
+		Globals::PressedKeys[VK_MBUTTON] = false;
+		break;
+	case WM_XBUTTONDOWN:
+	{
+		UINT button = GET_XBUTTON_WPARAM(wParam);
+		if (button == XBUTTON1)
+		{
+			Globals::PressedKeys[VK_XBUTTON1] = true;
+		}
+		else if (button == XBUTTON2)
+		{
+			Globals::PressedKeys[VK_XBUTTON2] = true;
+		}
+		break;
+	}
+	case WM_XBUTTONUP:
+	{
+		UINT button = GET_XBUTTON_WPARAM(wParam);
+		if (button == XBUTTON1)
+		{
+			Globals::PressedKeys[VK_XBUTTON1] = false;
+		}
+		else if (button == XBUTTON2)
+		{
+			Globals::PressedKeys[VK_XBUTTON2] = false;
+		}
+		break;
+	}
+	case WM_KEYDOWN:
+		Globals::PressedKeys[wParam] = true;
+		break;
+	case WM_KEYUP:
+		Globals::PressedKeys[wParam] = false;
+		break;
+	case WM_SYSKEYDOWN:
+		if (wParam == VK_MENU)
+			Globals::PressedKeys[VK_MENU] = true;
+		break;
+	case WM_SYSKEYUP:
+		if (wParam == VK_MENU)
+			Globals::PressedKeys[VK_MENU] = false;
+		break;
+	default: break;
+	}
+
+	g_Menu.HandleMenuVisibility();
+
+	if (g_Menu.D3DInit && g_Menu.menuOpened && ImGui_ImplDX9_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
 
     // Call original wndproc to make game use input again
     return CallWindowProcA(g_Hooks.pOriginalWNDProc, hWnd, uMsg, wParam, lParam);

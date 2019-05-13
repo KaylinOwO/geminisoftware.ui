@@ -16,6 +16,7 @@ public:
 	bool menuOpened;
 	void Render();
 	void GUI_Init(IDirect3DDevice9* pDevice);
+	void HandleMenuVisibility();
 	int PlayerList_Player[1024];
 	void DoPlayerList(int x, int y, int w, int h);
 

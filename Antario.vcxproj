@@ -283,6 +283,7 @@
   <ItemGroup>
     <None Include="Antario\SteamSDK\steam_api.json" />
     <None Include="Antario\SteamSDK\steam_api_interop.cs" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="xy0.rc" />

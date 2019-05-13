@@ -25,9 +25,11 @@ namespace Globals
 	std::string Username;
 	float          w2s_matrix[4][4];
 	DWORD CourierNew;
+	
 	DWORD SmallText;
 	DWORD WeaponESP;
 	DWORD WeaponIcon;
 	DWORD TabFont;
 	DWORD IndicatorFont;
+	bool PressedKeys[256] = {};
 }

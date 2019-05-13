@@ -32,4 +32,6 @@ namespace Globals
 	extern DWORD IndicatorFont;
 	extern HMODULE	       Module;
 	extern                float w2s_matrix[4][4];
+	extern bool PressedKeys[256];
+
 }

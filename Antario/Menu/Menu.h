@@ -3,7 +3,7 @@
 #include <string>
 #include <filesystem>
 #include "../SDK/Vector.h"
-
+#include <d3d9.h>
 
 struct ColorV2
 {

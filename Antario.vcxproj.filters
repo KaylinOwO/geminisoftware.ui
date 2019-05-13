@@ -16,6 +16,9 @@
     <Filter Include="Source Files\ImGui">
       <UniqueIdentifier>{9f07e42b-d58c-428a-8ada-bf096b81a7f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ImGui\dx9">
+      <UniqueIdentifier>{ca4bbf98-a75c-4ddb-997b-b986f6f6cdca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Antario\Hooks.cpp">
@@ -90,16 +93,13 @@
     <ClCompile Include="Antario\Features\SkinChanger\Skinchanger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Antario\ImGui\dx9\imgui_dx9.cpp">
+      <Filter>Source Files\ImGui\dx9</Filter>
+    </ClCompile>
     <ClCompile Include="Antario\ImGui\imgui.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Antario\ImGui\imgui_demo.cpp">
-      <Filter>Source Files\ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="Antario\ImGui\imgui_draw.cpp">
-      <Filter>Source Files\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Antario\ImGui\imgui_widgets.cpp">
       <Filter>Source Files\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -419,6 +419,9 @@
     <ClInclude Include="Antario\Features\SkinChanger\Skinchanger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Antario\ImGui\dx9\imgui_dx9.h">
+      <Filter>Source Files\ImGui\dx9</Filter>
+    </ClInclude>
     <ClInclude Include="Antario\ImGui\imconfig.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
@@ -428,13 +431,13 @@
     <ClInclude Include="Antario\ImGui\imgui_internal.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\ImGui\imstb_rectpack.h">
+    <ClInclude Include="Antario\ImGui\stb_rect_pack.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\ImGui\imstb_textedit.h">
+    <ClInclude Include="Antario\ImGui\stb_textedit.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Antario\ImGui\imstb_truetype.h">
+    <ClInclude Include="Antario\ImGui\stb_truetype.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
   </ItemGroup>

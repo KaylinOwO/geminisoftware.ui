@@ -1,5 +1,6 @@
 #pragma once
 #include "../SDK/singleton.h"
+#include <d3d9.h>
 class c_config : public singleton< c_config > {
 private:
 

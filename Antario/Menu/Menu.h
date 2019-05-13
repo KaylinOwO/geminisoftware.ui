@@ -15,6 +15,7 @@ class Menu
 public:
 	bool menuOpened;
 	void Render();
+	void GUI_Init(IDirect3DDevice9* pDevice);
 	int PlayerList_Player[1024];
 	void DoPlayerList(int x, int y, int w, int h);
 
@@ -67,7 +68,7 @@ public:
 		bool RemoveScope;
 		int	Test;
 	}Config;
-
+	bool D3DInit = false;
 private:
 	Vector _pos = Vector(500, 200, 0);
 	int ControlsX;

@@ -154,6 +154,7 @@ public:
 	static void __stdcall OverrideConfig(MaterialSystem_Config_t& config, bool bForceUpdate);
 	static void     __stdcall   Hooked_EndScene(IDirect3DDevice9* pDevice);
 	static void     __stdcall   Hooked_EndScene_Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
+	HWND                           hCSGOWindow = nullptr;
 private:
     /*---------------------------------------------*/
     /*-------------VMT Hook pointers---------------*/
@@ -184,8 +185,9 @@ private:
 	typedef void(__thiscall* ExtraBoneProcess_t) (void*, void*, void*, void*, void*, CBoneBitList&, void*);
 	typedef void(__stdcall* EndSceneFn)(IDirect3DDevice9* device);
 	typedef void(__stdcall* EndSceneResetFn)(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
+	
 private:
-    HWND                           hCSGOWindow             = nullptr; // CSGO window handle
+    // CSGO window handle
     bool                           bInitializedDrawManager = false;   // Check if we initialized our draw manager
     WNDPROC                        pOriginalWNDProc        = nullptr; // Original CSGO window proc
 };

@@ -277,6 +277,7 @@
     <ClInclude Include="Antario\Utils\SRect.h" />
     <ClInclude Include="Antario\Utils\Utils.h" />
     <ClInclude Include="Antario\Features\Visuals\ESP.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="std2017.h" />
   </ItemGroup>

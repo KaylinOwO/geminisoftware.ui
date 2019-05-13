@@ -13,7 +13,7 @@ struct ColorV2
 class Menu
 {
 public:
-	bool menuOpened;
+	bool menuOpened = true;
 	void Render();
 	void GUI_Init(IDirect3DDevice9* pDevice);
 	void HandleMenuVisibility();

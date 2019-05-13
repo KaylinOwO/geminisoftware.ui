@@ -512,6 +512,10 @@ void Hooks::Init()
 
 	DWORD shaderapidx9 = **(DWORD * *)(Utils::FindSignature("shaderapidx9.dll", "A1 ?? ?? ?? ?? 50 8B 08 FF 51 0C") + 1);
 
+	if(g_Hooks.hCSGOWindow)        // Hook WNDProc to capture mouse / keyboard input
+		g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hCSGOWindow, GWLP_WNDPROC,
+			reinterpret_cast<LONG_PTR>(g_Hooks.WndProc)));
+
     // VMTHooks
 	g_Hooks.pClientHook     = std::make_unique<VMTHook>(g_pClientDll);
     g_Hooks.pClientModeHook = std::make_unique<VMTHook>(g_pClientMode);
@@ -532,6 +536,9 @@ void Hooks::Init()
 	g_Hooks.pRenderViewHook->Hook(vtable_indexes::sceneEnd, Hooks::SceneEnd);
 	g_Hooks.D3DHook->Hook(vtable_indexes::end_scene, Hooks::Hooked_EndScene);
 	g_Hooks.D3DHook->Hook(vtable_indexes::end_scene_reset, Hooks::Hooked_EndScene_Reset);
+
+
+	
 
 	g_Event.Init();
 
@@ -558,7 +565,7 @@ IDirect3DStateBlock9* m_pStateBlockDraw;
 IDirect3DStateBlock9* m_pStateBlockText;
 DWORD					dwOld_D3DRS_COLORWRITEENABLE;
 #include <intrin.h>
-
+#include "../Font.h"
 void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 {
 	static auto oEndScene = g_Hooks.D3DHook->GetOriginal<EndSceneFn>(vtable_indexes::end_scene);
@@ -582,17 +589,152 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 		pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xffffffff);
 
 		ImGui_ImplDX9_NewFrame();
+		static int curTab = 1;
+		static int legit_aimbot_sub_curTab = 1;
+		static int rage_aimbot_sub_curTab = 1;
+		static int visuals_sub_curTab = 1;
 
 		if (g_Menu.menuOpened) {
 
-			int pX, pY;
-			g_InputSystem->GetCursorPosition(&pX, &pY);
-			ImGuiIO& io = ImGui::GetIO();
-			io.MousePos.x = (float)(pX);
-			io.MousePos.y = (float)(pY);
 
-			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(230, 141), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			ImGuiIO& io = ImGui::GetIO();
+
+			int pX, pY;
+			POINT mp;
+			GetCursorPos(&mp);
+			
+			io.MousePos.x = mp.x;
+			io.MousePos.y = mp.y;
+
+			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(450, 300), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
+				if(ImGui::BeginChild("##Tabs", ImVec2(75, 0))){
+					if (ImGui::Button("Legit Aim", ImVec2(75, 0))) {
+						curTab = 1;
+					}
+					if (ImGui::Button("Rage Aim", ImVec2(75, 0))) {
+						curTab = 2;
+					}
+					if (ImGui::Button("Visuals", ImVec2(75, 0))) {
+						curTab = 3;
+					}
+					ImGui::EndChild();
+				}
+
+				switch (curTab) {
+				case 1: {
+					ImGui::SetCursorPos(ImVec2(106, 40));
+
+					if (ImGui::BeginChild("##SubTabs", ImVec2(0, 25))) {
+
+						if (ImGui::Button("Main")) {
+							legit_aimbot_sub_curTab = 1;
+						}
+
+						ImGui::EndChild();
+					}
+
+					ImGui::SetCursorPos(ImVec2(106, 80));
+
+					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
+
+						switch (rage_aimbot_sub_curTab) {
+						case 1: {
+							ImGui::Checkbox("Enabled", &c_config::get().legit_aimbot_enabled);
+							ImGui::Checkbox("Position Adjustment", &c_config::get().legit_aimbot_backtrack);
+							ImGui::SliderInt("FOV", &c_config::get().legit_aimbot_fov, 0, 100);
+							ImGui::SliderInt("Speed", &c_config::get().linear_progression_threshold, 0, 100);
+							ImGui::Checkbox("RCS", &c_config::get().rcs);
+							ImGui::SliderInt("RCS X", &c_config::get().rcs_x, 0, 100);
+							ImGui::SliderInt("RCS Y", &c_config::get().rcs_y, 0, 100);
+						}break;
+						}
+						ImGui::EndChild();
+					}
+				} break;
+				case 2: {
+
+					ImGui::SetCursorPos(ImVec2(106, 40));
+
+					if (ImGui::BeginChild("##SubTabs", ImVec2(75, 25))) {
+
+						if (ImGui::Button("Main")) {
+							rage_aimbot_sub_curTab = 1;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Target")) {
+							rage_aimbot_sub_curTab = 2;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Body-Aim")) {
+							rage_aimbot_sub_curTab = 2;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Accuracy")) {
+							rage_aimbot_sub_curTab = 3;
+						}
+
+						ImGui::EndChild();
+					}
+
+					ImGui::SetCursorPos(ImVec2(106, 80));
+
+					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
+
+						switch (rage_aimbot_sub_curTab) {
+						case 1: {
+							ImGui::Checkbox("Enabled", &c_config::get().aimbot_enabled);
+							ImGui::Checkbox("Silent Aim", &c_config::get().aimbot_silentaim);
+							ImGui::Checkbox("Remove Recoil", &c_config::get().aimbot_norecoil);
+							ImGui::Checkbox("Fakelag Prediction", &c_config::get().fakelag_prediction);
+							ImGui::Checkbox("Auto Stop", &c_config::get().autostop);
+						}break;
+						case 2: {
+
+						}break;
+						case 3: {
+
+						}break;
+						}
+						ImGui::EndChild();
+					}
+				}break;
+				case 3: {
+
+					ImGui::SetCursorPos(ImVec2(106, 40));
+
+					if (ImGui::BeginChild("##SubTabs", ImVec2(75, 25))) {
+
+						if (ImGui::Button("Players")) {
+							visuals_sub_curTab = 1;
+						}
+
+						//ImGui::SameLine();
+
+						ImGui::EndChild();
+					}
+
+					ImGui::SetCursorPos(ImVec2(106, 80));
+
+					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
+
+						switch (rage_aimbot_sub_curTab) {
+						case 1: {
+
+						}break;
+						}
+
+						ImGui::EndChild();
+					}
+				}break;
+				}
+				ImGui::End();
 			}
 		}
 
@@ -1342,13 +1484,20 @@ void __fastcall Hooks::PaintTraverse(PVOID pPanels, int edx, unsigned int vguiPa
 	}
 
 
-	if (panelID == vguiPanel) 
+	if (panelID == vguiPanel)
 	{
 		if (c_config::get().visuals_enabled) {
 			c_visuals::get().draw_scope();
 			c_visuals::get().DrawPlayers();
 			c_event_logs::get().run();
 			//LogEvents::Draw();
+		}
+
+		static bool stored_menu_open = false;
+
+		if (stored_menu_open != g_Menu.menuOpened) { /// optimization $$
+			g_InputSystem->EnableInput(!g_Menu.menuOpened);
+			stored_menu_open = g_Menu.menuOpened;
 		}
 
 		g_Misc.SwapManual();
@@ -1373,12 +1522,19 @@ void __fastcall Hooks::PaintTraverse(PVOID pPanels, int edx, unsigned int vguiPa
 		//std::array< vec2_t, 3 >points{ vec2_t(screenSizeX / 2 - 16, screenSizeY / 2 - 16),
 		//vec2_t(screenSizeX / 2 + 16, screenSizeY / 2),
 		//vec2_t(screenSizeX / 2 - 16, screenSizeY / 2 + 16) };
-		
+
 
 		screenCenterX = screenSizeX / 2;
 		screenCenterY = screenSizeY / 2;
 
-	
+		if (g_Menu.menuOpened) {
+			g_pSurface->FilledRect(0, 0, 50, 50, Color(0, 255, 0));
+		}
+		else {
+			g_pSurface->FilledRect(0, 0, 50, 50, Color(255, 0, 0));
+		}
+
+
 		if (Hitmarkertime > 0) {
 		
 
@@ -1821,15 +1977,6 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			bButton = !bButton;
 	};
 
-    if (g_Hooks.bInitializedDrawManager)
-    {
-        // our wndproc capture fn
-        if (g_Menu.menuOpened)
-        {
-            return true;
-        }
-    }
-
 	switch (uMsg)
 	{
 	case WM_LBUTTONDOWN:
@@ -1893,8 +2040,8 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	default: break;
 	}
 
-	g_Menu.HandleMenuVisibility();
 
+	g_Menu.HandleMenuVisibility();
 	if (g_Menu.D3DInit && g_Menu.menuOpened && ImGui_ImplDX9_WndProcHandler(hWnd, uMsg, wParam, lParam))
 		return true;
 

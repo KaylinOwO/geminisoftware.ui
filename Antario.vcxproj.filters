@@ -440,6 +440,9 @@
     <ClInclude Include="Antario\ImGui\stb_truetype.h">
       <Filter>Source Files\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Antario\SteamSDK\steam_api.json" />

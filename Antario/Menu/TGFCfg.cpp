@@ -83,8 +83,6 @@ void CConfig::Setup()
 	SetupValue(c_config::get().fakelag_prediction, false, "Aimbot", "fakelag_prediction");
 	SetupValue(c_config::get().prefer_bodyaim, false, 5, "Aimbot", "prefer_bodyaim");
 	SetupValue(c_config::get().bodyaim_mode, 0, "Aimbot", "bodyaim_mode");
-	SetupValue(c_config::get().on_shot_aa, false, "Aimbot", "on_shot_aa");
-	SetupValue(c_config::get().on_shot_aa_type, 0, "Aimbot", "on_shot_aa_type");
 	SetupValue(c_config::get().aa_jitter, 0, "Aimbot", "aa_jitter");
 	SetupValue(c_config::get().bodyaim_health, 0, "Aimbot", "bodyaim_health");
 	SetupValue(c_config::get().bodyaim_shots, 0, "Aimbot", "bodyaim_shots");

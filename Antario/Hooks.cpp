@@ -602,10 +602,14 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 			/*Aim*/
 			const char* pitch[] = { "Disabled", "Down", "Up", "Origin", "Offset" };
-			const char* BodyAimOptions[] = { "In Air", "Slow Walk", "High Inaccuracy", "Vulnerable", "Lethal" };
+			const char* yaw[] = { "Disabled", "Backwards", "Origin", "Spin", "Manual" };
+			const char* BodyAimOptions[] = { "Bodyaim Players In Air", "Bodyaim Players Who Are Slow Walking", "Bodyaim With High Inaccuracy", "Bodyaim Vulnerable Players", "Bodyaim Lethal Shots" };
 			const char* HitboxOptionz[] = { "Hitscan", "Head Only" };
 			const char* AutoStopOptions[] = { "Minimum Speed", "Full Stop" };
 			const char* BodyAimModeOptions[] = { "Prefer", "Force" };
+			const char* WeaponGroupOptions[] = { "Auto", "Scout", "Awp", "Heavy Pistol (Deagle, Revolver)", "Other" };
+			const char* freestand_mode[] = { "Threat", "Crosshair", "Distance" };
+			const char* desync[] = { "Disabled", "Ephemeral", "Cromulent", "Ornery", "Jitter" };
 
 			/*Visuals*/
 			const char* WireFrameHands[] = { "Disabled", "Invisible", "Chams" };
@@ -622,7 +626,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 			io.MousePos.x = mp.x;
 			io.MousePos.y = mp.y;
 
-			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(450, 300), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+			ImGui::Begin("xy0", &g_Menu.menuOpened, ImVec2(800, 600), 1.f, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 			{
 				if (ImGui::BeginChild("##Tabs", ImVec2(75, 0))) {
 					if (ImGui::Button("Legit Aim", ImVec2(75, 0))) {
@@ -641,7 +645,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 				case 0: {
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(0, 25))) {
 
 						if (ImGui::Button("Main")) {
 							legit_aimbot_sub_curTab = 0;
@@ -672,7 +676,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(0, 25))) {
 
 						if (ImGui::Button("Main")) {
 							rage_aimbot_sub_curTab = 0;
@@ -686,8 +690,20 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 						ImGui::SameLine();
 
-						if (ImGui::Button("Body-Aim")) {
+						if (ImGui::Button("Accuracy")) {
 							rage_aimbot_sub_curTab = 2;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Body-Aim")) {
+							rage_aimbot_sub_curTab = 3;
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Anti-Aim")) {
+							rage_aimbot_sub_curTab = 4;
 						}
 
 						ImGui::EndChild();
@@ -713,23 +729,93 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 							ImGui::Checkbox("Auto Scope", &c_config::get().auto_scope);
 							ImGui::Checkbox("Auto Revolver", &c_config::get().autorevolver);
 							ImGui::Checkbox("Accuracy Boost", &c_config::get().accuracy_boost);
-
-							ImGui::Spacing();
-							ImGui::Spacing();
-
-							ImGui::Checkbox("Resolver", &c_config::get().aimbot_resolver);
+							
 						}break;
 						case 1: {
 							ImGui::SliderInt("Head Scale", &c_config::get().aimbot_headpointscale, 0, 100);
 							ImGui::SliderInt("Body Scale", &c_config::get().aimbot_bodypointscale, 0, 100);
 						}break;
 						case 2: {
+							ImGui::Checkbox("Resolver", &c_config::get().aimbot_resolver);
+							static int weapon_group;
 
-							/*MultiComboBox(5, "Body-Aim", BodyAimOptions, c_config::get().prefer_bodyaim);
-							combobox(2, "Body-Aim Mode", BodyAimModeOptions, &c_config::get().bodyaim_mode);*/
+							ImGui::Combo("Weapon Group", &weapon_group, WeaponGroupOptions, ARRAYSIZE(WeaponGroupOptions));
+
+							switch (weapon_group) {
+							case 0:
+							{
+								ImGui::SliderInt("Hitchance", &c_config::get().auto_hitchance, 0, 100);
+								ImGui::SliderInt("Minimum Damage", &c_config::get().auto_mindamage, 0, 100);
+							}
+							break;
+							case 1:
+							{
+								ImGui::SliderInt("Hitchance", &c_config::get().scout_hitchance, 0, 100);
+								ImGui::SliderInt("Minimum Damage", &c_config::get().scout_mindamage, 0, 100);
+							}
+							break;
+							case 2:
+							{
+								ImGui::SliderInt("Hitchance", &c_config::get().awp_hitchance, 0, 100);
+								ImGui::SliderInt("Minimum Damage", &c_config::get().awp_mindamage, 0, 100);
+							}
+							break;
+							case 3:
+							{
+								ImGui::SliderInt("Hitchance", &c_config::get().heavy_pistol_hitchance, 0, 100);
+								ImGui::SliderInt("Minimum Damage", &c_config::get().heavy_pistol_mindamage, 0, 100);
+							}
+							break;
+							case 4:
+							{
+								ImGui::SliderInt("Hitchance", &c_config::get().other_hitchance, 0, 100);
+								ImGui::SliderInt("Minimum Damage", &c_config::get().other_mindamage, 0, 100);
+							}
+							break;
+							}
+						}break;
+						case 3: {
+
+							ImGui::Combo("Baim Mode", &c_config::get().bodyaim_mode, BodyAimModeOptions, ARRAYSIZE(BodyAimModeOptions));
 							ImGui::SliderInt("Baim < X Health", &c_config::get().bodyaim_health, 0, 101);
 							ImGui::SliderInt("Baim After X Missed Shots", &c_config::get().bodyaim_shots, 0, 10);
+							ImGui::Checkbox(BodyAimOptions[0], &c_config::get().prefer_bodyaim[0]);
+							ImGui::Checkbox(BodyAimOptions[1], &c_config::get().prefer_bodyaim[1]);
+							ImGui::Checkbox(BodyAimOptions[2], &c_config::get().prefer_bodyaim[2]);
+							ImGui::Checkbox(BodyAimOptions[3], &c_config::get().prefer_bodyaim[3]);
+							ImGui::Checkbox(BodyAimOptions[4], &c_config::get().prefer_bodyaim[4]);
+						}break;
+						case 4: {
+							ImGui::Checkbox("Enabled", &c_config::get().antiaim_enabled);
 
+							static int aa_type;
+
+							ImGui::Combo("Anti-Aim Type", &aa_type, "Standing\0Moving\0In Air", 3);
+
+							switch (aa_type) {
+							case 0: {
+								ImGui::Combo("X", &c_config::get().pitch_standing, pitch, ARRAYSIZE(pitch));
+								ImGui::Combo("Y", &c_config::get().yaw_standing, yaw, ARRAYSIZE(yaw));
+							}break;
+							case 1: {
+								ImGui::Combo("X", &c_config::get().pitch_moving, pitch, ARRAYSIZE(pitch));
+								ImGui::Combo("Y", &c_config::get().yaw_moving, yaw, ARRAYSIZE(yaw));
+							}break;
+							case 2: {
+								ImGui::Combo("X", &c_config::get().pitch_air, pitch, ARRAYSIZE(pitch));
+								ImGui::Combo("Y", &c_config::get().yaw_air, yaw, ARRAYSIZE(yaw));
+							}break;
+							}
+
+							ImGui::Checkbox("Auto Direction", &c_config::get().antiaim_freestanding);
+							if (c_config::get().antiaim_freestanding) {
+								ImGui::SameLine();
+								ImGui::Combo("##freestand", &c_config::get().antiaim_freestanding_mode, freestand_mode, ARRAYSIZE(freestand_mode));
+								ImGui::SameLine();
+								ImGui::Checkbox("Extrapolated", &c_config::get().extrapolated);
+							}
+							ImGui::Combo("Desync", &c_config::get().desync, desync, ARRAYSIZE(desync));
+							ImGui::SliderInt("Angle Jitter", &c_config::get().aa_jitter, 0, 180);
 						}break;
 						}
 						ImGui::EndChild();
@@ -739,7 +825,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(0, 25))) {
 
 						if (ImGui::Button("Players")) {
 							visuals_sub_curTab = 0;

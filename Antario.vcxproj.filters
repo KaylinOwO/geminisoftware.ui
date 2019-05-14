@@ -443,6 +443,9 @@
     <ClInclude Include="Font.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImGuiFonts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Antario\SteamSDK\steam_api.json" />

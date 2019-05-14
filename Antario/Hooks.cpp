@@ -566,6 +566,8 @@ IDirect3DStateBlock9* m_pStateBlockText;
 DWORD					dwOld_D3DRS_COLORWRITEENABLE;
 #include <intrin.h>
 #include "../Font.h"
+#include "../ImGuiFonts.h"
+CIFonts gIFonts;
 void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 {
 	static auto oEndScene = g_Hooks.D3DHook->GetOriginal<EndSceneFn>(vtable_indexes::end_scene);
@@ -579,8 +581,8 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 	if (dwReturnAddress == _ReturnAddress())
 	{
-		pDevice->CreateStateBlock(D3DSBT_ALL, &m_pStateBlockDraw);
-		pDevice->CreateStateBlock(D3DSBT_ALL, &m_pStateBlockText);
+		pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &m_pStateBlockDraw);
+		pDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &m_pStateBlockText);
 
 		if (m_pStateBlockDraw)
 			m_pStateBlockDraw->Capture();
@@ -593,10 +595,10 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 		if (g_Menu.menuOpened)
 		{
-			static int curTab = 1;
-			static int legit_aimbot_sub_curTab = 1;
-			static int rage_aimbot_sub_curTab = 1;
-			static int visuals_sub_curTab = 1;
+			static int curTab = 0;
+			static int legit_aimbot_sub_curTab = 0;
+			static int rage_aimbot_sub_curTab = 0;
+			static int visuals_sub_curTab = 0;
 
 			/*Aim*/
 			const char* pitch[] = { "Disabled", "Down", "Up", "Origin", "Offset" };
@@ -624,25 +626,25 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 			{
 				if (ImGui::BeginChild("##Tabs", ImVec2(75, 0))) {
 					if (ImGui::Button("Legit Aim", ImVec2(75, 0))) {
-						curTab = 1;
+						curTab = 0;
 					}
 					if (ImGui::Button("Rage Aim", ImVec2(75, 0))) {
-						curTab = 2;
+						curTab = 1;
 					}
 					if (ImGui::Button("Visuals", ImVec2(75, 0))) {
-						curTab = 3;
+						curTab = 2;
 					}
 					ImGui::EndChild();
 				}
 
 				switch (curTab) {
-				case 1: {
+				case 0: {
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(0, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
 
 						if (ImGui::Button("Main")) {
-							legit_aimbot_sub_curTab = 1;
+							legit_aimbot_sub_curTab = 0;
 						}
 
 						ImGui::EndChild();
@@ -653,7 +655,7 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
 
 						switch (legit_aimbot_sub_curTab) {
-						case 1: {
+						case 0: {
 							ImGui::Checkbox("Enabled", &c_config::get().legit_aimbot_enabled);
 							ImGui::Checkbox("Position Adjustment", &c_config::get().legit_aimbot_backtrack);
 							ImGui::SliderInt("FOV", &c_config::get().legit_aimbot_fov, 0, 100);
@@ -666,20 +668,20 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 						ImGui::EndChild();
 					}
 				} break;
-				case 2: {
+				case 1: {
 
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(75, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
 
 						if (ImGui::Button("Main")) {
-							rage_aimbot_sub_curTab = 1;
+							rage_aimbot_sub_curTab = 0;
 						}
 
 						ImGui::SameLine();
 
 						if (ImGui::Button("Target")) {
-							rage_aimbot_sub_curTab = 2;
+							rage_aimbot_sub_curTab = 1;
 						}
 
 						ImGui::SameLine();
@@ -688,29 +690,26 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 							rage_aimbot_sub_curTab = 2;
 						}
 
-						ImGui::SameLine();
-
-						if (ImGui::Button("Accuracy")) {
-							rage_aimbot_sub_curTab = 3;
-						}
-
 						ImGui::EndChild();
 					}
 
 					ImGui::SetCursorPos(ImVec2(106, 80));
 
 					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
-
+						
 						switch (rage_aimbot_sub_curTab) {
-						case 1: {
+						case 0: {
 							ImGui::Checkbox("Enabled", &c_config::get().aimbot_enabled);
 							ImGui::Checkbox("Silent Aim", &c_config::get().aimbot_silentaim);
 							ImGui::Checkbox("Remove Recoil", &c_config::get().aimbot_norecoil);
 							ImGui::Checkbox("Fakelag Prediction", &c_config::get().fakelag_prediction);
 							ImGui::Checkbox("Auto Stop", &c_config::get().autostop);
-							ImGui::SameLine();
-							if (c_config::get().autostop) ImGui::Combo("##autostopopt", &c_config::get().autostop_mode, AutoStopOptions, ARRAYSIZE(AutoStopOptions));
-							if (c_config::get().autostop) ImGui::Checkbox("Stop Between Shots", &c_config::get().stop_inbetween_shots);
+							if (c_config::get().autostop) 
+							{
+								ImGui::SameLine();
+								ImGui::Combo("##autostopopt", &c_config::get().autostop_mode, AutoStopOptions, ARRAYSIZE(AutoStopOptions));
+								ImGui::Checkbox("Stop Between Shots", &c_config::get().stop_inbetween_shots);
+							}
 							ImGui::Checkbox("Auto Scope", &c_config::get().auto_scope);
 							ImGui::Checkbox("Auto Revolver", &c_config::get().autorevolver);
 							ImGui::Checkbox("Accuracy Boost", &c_config::get().accuracy_boost);
@@ -720,11 +719,11 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 							ImGui::Checkbox("Resolver", &c_config::get().aimbot_resolver);
 						}break;
-						case 2: {
+						case 1: {
 							ImGui::SliderInt("Head Scale", &c_config::get().aimbot_headpointscale, 0, 100);
 							ImGui::SliderInt("Body Scale", &c_config::get().aimbot_bodypointscale, 0, 100);
 						}break;
-						case 3: {
+						case 2: {
 
 							/*MultiComboBox(5, "Body-Aim", BodyAimOptions, c_config::get().prefer_bodyaim);
 							combobox(2, "Body-Aim Mode", BodyAimModeOptions, &c_config::get().bodyaim_mode);*/
@@ -736,14 +735,14 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 						ImGui::EndChild();
 					}
 				}break;
-				case 3: {
+				case 2: {
 
 					ImGui::SetCursorPos(ImVec2(106, 40));
 
-					if (ImGui::BeginChild("##SubTabs", ImVec2(75, 25))) {
+					if (ImGui::BeginChild("##SubTabs", ImVec2(450, 25))) {
 
 						if (ImGui::Button("Players")) {
-							visuals_sub_curTab = 1;
+							visuals_sub_curTab = 0;
 						}
 
 						//ImGui::SameLine();
@@ -755,8 +754,8 @@ void __stdcall Hooks::Hooked_EndScene(IDirect3DDevice9* pDevice)
 
 					if (ImGui::BeginChild("##Controls", ImVec2(0, 0))) {
 
-						switch (rage_aimbot_sub_curTab) {
-						case 1: {
+						switch (visuals_sub_curTab) {
+						case 0: {
 							ImGui::Checkbox("Enabled", &c_config::get().visuals_enabled);
 							//	color_selector("name_col", &c_config::get().name_esp_color_r, &c_config::get().name_esp_color_g,
 							//		&c_config::get().name_esp_color_b, &c_config::get().name_esp_color_a);
@@ -1571,12 +1570,12 @@ void __fastcall Hooks::PaintTraverse(PVOID pPanels, int edx, unsigned int vguiPa
 		screenCenterX = screenSizeX / 2;
 		screenCenterY = screenSizeY / 2;
 
-		if (g_Menu.menuOpened) {
+		/*if (g_Menu.menuOpened) {
 			g_pSurface->FilledRect(0, 0, 50, 50, Color(0, 255, 0));
 		}
 		else {
 			g_pSurface->FilledRect(0, 0, 50, 50, Color(255, 0, 0));
-		}
+		}*/
 
 
 		if (Hitmarkertime > 0) {

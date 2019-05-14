@@ -76,7 +76,7 @@
     <TargetName>load</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Beta|Win32'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)build\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(VC_ExecutablePath_x86);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
@@ -278,6 +278,7 @@
     <ClInclude Include="Antario\Utils\Utils.h" />
     <ClInclude Include="Antario\Features\Visuals\ESP.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="ImGuiFonts.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="std2017.h" />
   </ItemGroup>

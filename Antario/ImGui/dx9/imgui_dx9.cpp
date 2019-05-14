@@ -60,7 +60,7 @@ void ImGui_ImplDX9_RenderDrawLists(ImDrawData* draw_data)
 
 	// Backup the DX9 state
 	IDirect3DStateBlock9* d3d9_state_block = NULL;
-	if (g_pd3dDevice->CreateStateBlock(D3DSBT_ALL, &d3d9_state_block) < 0)
+	if (g_pd3dDevice->CreateStateBlock(D3DSBT_PIXELSTATE, &d3d9_state_block) < 0)
 		return;
 
 	// Copy and convert all vertices into a single contiguous buffer
